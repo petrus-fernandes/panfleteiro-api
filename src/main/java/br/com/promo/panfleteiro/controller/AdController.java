@@ -14,7 +14,7 @@ import br.com.promo.panfleteiro.entity.Ad;
 import br.com.promo.panfleteiro.service.AdService;
 
 @RestController
-@RequestMapping("/ads")
+@RequestMapping("/anuncios")
 public class AdController {
 
     AdService adService;

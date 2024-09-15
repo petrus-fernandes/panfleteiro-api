@@ -13,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "address")
+@Table(name = "location")
 public class Location implements Serializable {
 
     @Id

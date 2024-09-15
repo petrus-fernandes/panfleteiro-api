@@ -14,7 +14,7 @@ import br.com.promo.panfleteiro.entity.Market;
 import br.com.promo.panfleteiro.service.MarketService;
 
 @RestController
-@RequestMapping("/markets")
+@RequestMapping("/mercados")
 public class MarketController {
 
     MarketService marketService;

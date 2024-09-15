@@ -14,7 +14,7 @@ import br.com.promo.panfleteiro.entity.Location;
 import br.com.promo.panfleteiro.service.LocationService;
 
 @RestController
-@RequestMapping("/locations")
+@RequestMapping("/locais")
 public class LocationController {
 
     LocationService locationService;

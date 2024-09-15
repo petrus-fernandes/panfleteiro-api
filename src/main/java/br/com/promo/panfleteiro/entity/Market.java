@@ -18,11 +18,11 @@ public class Market implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
+    private String name;
 
     @OneToOne
-    @JoinColumn(name = "address_id")
-    private Location address;
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     public Long getId() {
         return id;
@@ -32,19 +32,19 @@ public class Market implements Serializable {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Location getAddress() {
-        return address;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setAddress(Location address) {
-        this.address = address;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }
