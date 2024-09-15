@@ -11,8 +11,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "mercado")
-public class Mercado implements Serializable {
+@Table(name = "market")
+public class Market implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +21,8 @@ public class Mercado implements Serializable {
     private String nome;
 
     @OneToOne
-    @JoinColumn(name = "endereco_id")
-    private Endereco endereco;
+    @JoinColumn(name = "address_id")
+    private Location address;
 
     public Long getId() {
         return id;
@@ -40,11 +40,11 @@ public class Mercado implements Serializable {
         this.nome = nome;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
+    public Location getAddress() {
+        return address;
     }
 
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
+    public void setAddress(Location address) {
+        this.address = address;
     }
 }

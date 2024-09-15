@@ -11,20 +11,20 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "anuncio")
-public class Anuncio implements Serializable {
+@Table(name = "ad")
+public class Ad implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "mercado_id")
-    private Mercado mercado;
+    @JoinColumn(name = "market_id")
+    private Market market;
 
-    private String nome;
+    private String name;
 
-    private Double preco;
+    private Double price;
 
     private String url;
 
@@ -36,28 +36,28 @@ public class Anuncio implements Serializable {
         this.id = id;
     }
 
-    public Mercado getMercado() {
-        return mercado;
+    public Market getMarket() {
+        return market;
     }
 
-    public void setMercado(Mercado mercado) {
-        this.mercado = mercado;
+    public void setMarket(Market market) {
+        this.market = market;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String nome) {
+        this.name = nome;
     }
 
-    public Double getPreco() {
-        return preco;
+    public Double getPrice() {
+        return price;
     }
 
-    public void setPreco(Double preco) {
-        this.preco = preco;
+    public void setPrice(Double preco) {
+        this.price = preco;
     }
 
     public String getUrl() {

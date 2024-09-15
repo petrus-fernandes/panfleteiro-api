@@ -13,8 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "endereco")
-public class Endereco implements Serializable {
+@Table(name = "address")
+public class Location implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class Endereco implements Serializable {
 
     private Double longitude;
     
-    private String logradouro;
+    private String address;
 
     public Long getId() {
         return id;
@@ -44,14 +44,14 @@ public class Endereco implements Serializable {
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
-    public String getLogradouro() {
-        return logradouro;
+    public String getAddress() {
+        return address;
     }
-    public void setLogradouro(String logradouro) {
-        this.logradouro = logradouro;
+    public void setAddress(String logradouro) {
+        this.address = logradouro;
     }
 
-    public Double calcularDistanciaEmKm(Endereco endereco) {
-        return 6371.0 * acos(sin(endereco.latitude)*sin(this.latitude)+cos(endereco.latitude)*cos(this.latitude)*cos(endereco.longitude-this.longitude));
+    public Double calculateDistanceInKm(Location address) {
+        return 6371.0 * acos(sin(address.latitude)*sin(this.latitude)+cos(address.latitude)*cos(this.latitude)*cos(address.longitude-this.longitude));
     }
 }
