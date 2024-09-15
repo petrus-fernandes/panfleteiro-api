@@ -1,5 +1,9 @@
 package br.com.promo.panfleteiro.entity;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.acos;
+
 import java.io.Serializable;
 
 import jakarta.persistence.Entity;
@@ -16,9 +20,9 @@ public class Endereco implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String latitude;
+    private Double latitude;
 
-    private String longitude;
+    private Double longitude;
     
     private String logradouro;
 
@@ -28,16 +32,16 @@ public class Endereco implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
-    public void setLatitude(String latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
-    public String getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
-    public void setLongitude(String longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
     public String getLogradouro() {
@@ -45,5 +49,9 @@ public class Endereco implements Serializable {
     }
     public void setLogradouro(String logradouro) {
         this.logradouro = logradouro;
+    }
+
+    public Double calcularDistanciaEmKm(Endereco endereco) {
+        return 6371.0 * acos(sin(endereco.latitude)*sin(this.latitude)+cos(endereco.latitude)*cos(this.latitude)*cos(endereco.longitude-this.longitude));
     }
 }
