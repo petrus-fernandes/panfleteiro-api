@@ -2,44 +2,53 @@ package br.com.promo.panfleteiro.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import br.com.promo.panfleteiro.entity.Market;
+import br.com.promo.panfleteiro.request.MarketRequest;
+import br.com.promo.panfleteiro.response.MarketResponse;
 import br.com.promo.panfleteiro.service.MarketService;
 
 @RestController
-@RequestMapping("/mercados")
+@RequestMapping("/v1/mercados")
 public class MarketController {
 
-    MarketService marketService;
+    private final MarketService marketService;
 
     public MarketController(MarketService marketService) {
         this.marketService = marketService;
     }
 
-    @PostMapping
-    List<Market> create(Market market) {
-        return marketService.create(market);
-    }
-
     @GetMapping
-    List<Market> list() {
-        return marketService.list();
+    public ResponseEntity<List<MarketResponse>> findAll() {
+        return ResponseEntity.ok(marketService.findAll());
     }
 
-    @PutMapping
-    List<Market> update(Market market) {
-        return marketService.update(market);
+    @GetMapping("/{id}")
+    public ResponseEntity<MarketResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(marketService.getMarketResponseById(id));
     }
-    
-    @DeleteMapping("{id}")
-    List<Market> delete(@PathVariable Long id) {
-        return marketService.delete(id);
+
+    @PostMapping
+    public ResponseEntity<MarketResponse> create(@RequestBody MarketRequest marketRequest) {
+        return ResponseEntity.status(201).body(marketService.create(marketRequest));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MarketResponse> update(@PathVariable Long id, @RequestBody MarketRequest marketRequest) {
+        return ResponseEntity.ok(marketService.update(id, marketRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        marketService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/nome")
+    public ResponseEntity<List<MarketResponse>> findByNameContaining(@RequestParam String name) {
+        List<MarketResponse> markets = marketService.findByName(name);
+        return ResponseEntity.ok(markets);
     }
 }

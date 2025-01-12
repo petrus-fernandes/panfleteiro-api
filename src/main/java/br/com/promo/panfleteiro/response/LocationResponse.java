@@ -1,6 +1,8 @@
-package br.com.promo.panfleteiro.dto;
+package br.com.promo.panfleteiro.response;
 
-public class LocationDTO {
+import java.util.List;
+
+public class LocationResponse {
 
     private Long id;
 
@@ -9,6 +11,18 @@ public class LocationDTO {
     private Double longitude;
     
     private String address;
+
+    private Boolean active;
+
+    public LocationResponse(Long id, Double latitude, Double longitude, String address, Boolean active) {
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.active = active;
+    }
+
+
 
     public Long getId() {
         return id;
@@ -40,5 +54,13 @@ public class LocationDTO {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

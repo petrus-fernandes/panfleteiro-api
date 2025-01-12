@@ -1,14 +1,10 @@
 package br.com.promo.panfleteiro.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "market")
@@ -20,9 +16,18 @@ public class Market implements Serializable {
 
     private String name;
 
-    @OneToOne
-    @JoinColumn(name = "location_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_market", value = ConstraintMode.CONSTRAINT))
     private Location location;
+
+
+    public Market(String name, Location location) {
+        this.name = name;
+        this.location = location;
+    }
+
+    public Market(){
+    }
 
     public Long getId() {
         return id;

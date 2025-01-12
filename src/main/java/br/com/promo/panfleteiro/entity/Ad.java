@@ -1,32 +1,44 @@
 package br.com.promo.panfleteiro.entity;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ad")
 public class Ad implements Serializable {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "market_id")
-    private Market market;
-
-    private String name;
-
-    private Double price;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     private String url;
+
+    private Boolean active;
+
+    private BigDecimal price;
+
+    @ManyToOne
+    @JoinColumn(name = "flyer_section_id")
+    private FlyerSection flyerSection;
+
+    public Ad(Product product, String url, Boolean active, BigDecimal price, FlyerSection flyerSection) {
+        this.product = product;
+        this.url = url;
+        this.active = active;
+        this.price = price;
+        this.flyerSection = flyerSection;
+    }
+
+    public Ad() {
+    }
 
     public Long getId() {
         return id;
@@ -36,28 +48,12 @@ public class Ad implements Serializable {
         this.id = id;
     }
 
-    public Market getMarket() {
-        return market;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setMarket(Market market) {
-        this.market = market;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String nome) {
-        this.name = nome;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double preco) {
-        this.price = preco;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public String getUrl() {
@@ -68,4 +64,37 @@ public class Ad implements Serializable {
         this.url = url;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public FlyerSection getFlyerSection() {
+        return flyerSection;
+    }
+
+    public void setFlyerSection(FlyerSection flyerSection) {
+        this.flyerSection = flyerSection;
+    }
+
+    public void addProduct(Product product) {
+        product.addAd(this);
+        this.product = product;
+    }
+
+    public void removeProduct() {
+        this.product.removeAd(this);
+        this.product = null;
+    }
 }

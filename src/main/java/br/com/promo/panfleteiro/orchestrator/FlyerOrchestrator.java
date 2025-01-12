@@ -1,0 +1,144 @@
+package br.com.promo.panfleteiro.orchestrator;
+
+import br.com.promo.panfleteiro.entity.*;
+import br.com.promo.panfleteiro.request.AdRequest;
+import br.com.promo.panfleteiro.request.FlyerRequest;
+import br.com.promo.panfleteiro.request.FlyerSectionRequest;
+import br.com.promo.panfleteiro.service.*;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class FlyerOrchestrator {
+
+    private final AdService adService;
+
+    private final FlyerService flyerService;
+
+    private final MarketService marketService;
+
+    private final FlyerSectionService flyerSectionService;
+
+    private final ProductService productService;
+
+
+    public FlyerOrchestrator(AdService adService, FlyerService flyerService, MarketService marketService, FlyerSectionService flyerSectionService, ProductService productService) {
+        this.adService = adService;
+        this.flyerService = flyerService;
+        this.marketService = marketService;
+        this.flyerSectionService = flyerSectionService;
+        this.productService = productService;
+    }
+
+    public FlyerSection createFlyerSectionWithAds(FlyerSectionRequest flyerSectionRequest) {
+        FlyerSection flyerSection = flyerSectionService.create(flyerSectionRequest);
+        Flyer flyer = flyerService.findById(flyerSectionRequest.getFlyerId());
+        List<Market> markets = flyerSectionRequest.getMarketsId().stream().map(marketService::findById).collect(Collectors.toList());
+
+        List<Ad> ads = flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
+
+        flyerSection.setFlyer(flyer);
+        flyerSection.setMarkets(markets);
+
+        ads.forEach(ad -> {
+            flyerSection.addAd(ad);
+            adService.saveAd(ad);
+        });
+
+        return flyerSectionService.save(flyerSection);
+    }
+
+    public FlyerSection createFlyerSection(FlyerSectionRequest flyerSectionRequest) {
+        FlyerSection flyerSection = flyerSectionService.create(flyerSectionRequest);
+        Flyer flyer = flyerService.findById(flyerSectionRequest.getFlyerId());
+        List<Market> markets = flyerSectionRequest.getMarketsId().stream().map(marketService::findById).collect(Collectors.toList());
+
+        List<Ad> ads = flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
+
+        flyerSection.setFlyer(flyer);
+        flyerSection.setMarkets(markets);
+
+        ads.forEach(ad -> {
+            flyerSection.addAd(ad);
+            adService.saveAd(ad);
+        });
+
+        return flyerSectionService.save(flyerSection);
+    }
+
+    public FlyerSection updateFlyerSection(Long id, FlyerSectionRequest flyerSectionRequest) {
+        FlyerSection flyerSection = flyerSectionService.findById(id);
+        flyerSection.setExpirationDate(flyerSectionRequest.getExpirationDate());
+        flyerSection.setInitialDate(flyerSectionRequest.getInitialDate());
+        flyerSection.setActive(flyerSectionRequest.getActive());
+        flyerSection.getMarkets().clear();
+        getMarketsByIds(flyerSectionRequest.getMarketsId()).forEach(flyerSection::addMarket);
+        return flyerSectionService.save(flyerSection);
+    }
+
+    public Flyer createFlyer(FlyerRequest flyerRequest) {
+         Flyer flyer = flyerService.create(flyerRequest);
+         if (flyerRequest.getMarketsId() != null && !flyerRequest.getMarketsId().isEmpty()) {
+             flyerRequest.getMarketsId().stream().map(marketService::findById).forEach(flyer::addMarket);
+         }
+         if (flyerRequest.getFlyerSectionsId() != null && !flyerRequest.getFlyerSectionsId().isEmpty()) {
+             flyerRequest.getFlyerSectionsId().stream().map(flyerSectionService::findById).forEach(flyer::addFlyerSection);
+         }
+
+         return flyerService.save(flyer);
+    }
+
+    public Flyer updateFlyer(Long id, FlyerRequest flyerRequest) {
+        Flyer flyer = flyerService.findById(id);
+        flyer.setExpirationDate(flyerRequest.getExpirationDate());
+        flyer.setInitialDate(flyerRequest.getInitialDate());
+        flyer.setActive(flyerRequest.getActive());
+        flyer.getFlyerSections().clear();
+        flyer.getMarkets().clear();
+
+        if (flyerRequest.getFlyerSectionsId() != null && !flyerRequest.getFlyerSectionsId().isEmpty()) {
+            getFlyerSectionsByIds(flyerRequest.getFlyerSectionsId()).forEach(flyer::addFlyerSection);
+        }
+
+        if (flyerRequest.getMarketsId() != null && !flyerRequest.getMarketsId().isEmpty()) {
+            getMarketsByIds(flyerRequest.getMarketsId()).forEach(flyer::addMarket);
+        }
+        return flyerService.save(flyer);
+    }
+
+    private List<FlyerSection> getFlyerSectionsByIds(List<Long> flyerSectionsId) {
+        return flyerSectionsId.stream().map(flyerSectionService::findById).collect(Collectors.toList());
+    }
+
+    private List<Market> getMarketsByIds(List<Long> marketsId) {
+        return marketsId.stream().map(marketService::findById).collect(Collectors.toList());
+    }
+
+    public Ad createAd(AdRequest adRequest) {
+        Ad ad = adService.create(adRequest);
+        ad.setProduct(productService.findById(adRequest.getProductId()));
+        if (adRequest.getFlyerSectionId() != null) {
+            FlyerSection flyerSection = flyerSectionService.findById(adRequest.getFlyerSectionId());
+            flyerSection.addAd(ad);
+            flyerSectionService.save(flyerSection);
+        } else {
+            adService.saveAd(ad);
+        }
+        return ad;
+    }
+
+    public Ad updateAd(Long id, AdRequest adRequest) {
+        Ad ad = adService.findById(id);
+        Product newProduct = productService.findById(adRequest.getProductId());
+        if (ad.getProduct() != null && ad.getProduct() != newProduct) {
+            ad.removeProduct();
+        }
+        ad.addProduct(newProduct);
+        ad.setPrice(adRequest.getPrice());
+        ad.setActive(adRequest.getActive());
+        ad.setUrl(adRequest.getUrl());
+        return adService.saveAd(ad);
+    }
+}

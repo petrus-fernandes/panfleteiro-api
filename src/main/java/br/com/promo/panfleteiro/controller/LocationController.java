@@ -2,19 +2,16 @@ package br.com.promo.panfleteiro.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import br.com.promo.panfleteiro.request.LocationRequest;
+import br.com.promo.panfleteiro.response.LocationResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.promo.panfleteiro.entity.Location;
 import br.com.promo.panfleteiro.service.LocationService;
 
 @RestController
-@RequestMapping("/locais")
+@RequestMapping("/v1/locais")
 public class LocationController {
 
     LocationService locationService;
@@ -24,22 +21,28 @@ public class LocationController {
     }
 
     @PostMapping
-    List<Location> create(Location location) {
-        return locationService.create(location);
+    ResponseEntity<LocationResponse> create(@RequestBody LocationRequest location) {
+        return ResponseEntity.status(201).body(locationService.createLocation(location));
     }
 
     @GetMapping
-    List<Location> list() {
-        return locationService.list();
+    ResponseEntity<List<LocationResponse>> findAll() {
+        return ResponseEntity.ok(locationService.findAll());
     }
 
-    @PutMapping
-    List<Location> update(Location location) {
-        return locationService.update(location);
+    @PutMapping("/{id}")
+    ResponseEntity<LocationResponse> update(@PathVariable Long id, @RequestBody LocationRequest location) {
+        return ResponseEntity.ok(locationService.updateLocation(id, location));
     }
     
-    @DeleteMapping("{id}")
-    List<Location> delete(@PathVariable Long id) {
-        return locationService.delete(id);
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> delete(@PathVariable Long id) {
+        locationService.deleteLocation(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<LocationResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(locationService.getLocationResponseById(id));
     }
 }
