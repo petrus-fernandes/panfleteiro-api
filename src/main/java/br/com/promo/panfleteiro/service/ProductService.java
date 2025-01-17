@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
@@ -32,23 +32,18 @@ public class ProductService {
     }
 
     public ProductResponse create(ProductRequest productRequest) {
-        Product product = productRepository.save(convertToProduct(productRequest));
-        return convertToProductResponse(product);
+        Product product = new Product();
+        product.setName(productRequest.getName());
+        product.setProductCategory(ProductCategory.fromCode(productRequest.getProductCategory()));
+        return convertToProductResponse(productRepository.save(product));
     }
 
-    private Product convertToProduct(ProductRequest productRequest) {
-//        List<Ad> ads = productRequest.getAdIds().isEmpty() ? new ArrayList<>() : productRequest.getAdIds().stream().map(adService::findById).toList();
-        return new Product(productRequest.getName(), ProductCategory.fromCode(productRequest.getProductCategory()));
-    }
-
-    public ProductResponse update(Long id, ProductRequest product) {
-        Product existingProduct = productRepository.findById(id)
+    public ProductResponse update(Long id, ProductRequest productRequest) {
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id.toString()));
-        existingProduct.setName(product.getName());
-        existingProduct.setProductCategory(ProductCategory.fromCode(product.getProductCategory()));
-//        existingProduct.setAds(product.getAdIds().stream().map(adService::findById).toList());
-        existingProduct = productRepository.save(existingProduct);
-        return convertToProductResponse(existingProduct);
+        product.setName(productRequest.getName());
+        product.setProductCategory(ProductCategory.fromCode(productRequest.getProductCategory()));
+        return convertToProductResponse(productRepository.save(product));
     }
 
     public void delete(Long id) {
@@ -60,12 +55,8 @@ public class ProductService {
     }
 
     public ProductResponse convertToProductResponse(Product product) {
-//        List<AdResponse> adsResponse = product.getAds().stream().map(adService::convertToAdResponse).toList();
-        return new ProductResponse(product.getId(), product.getName(), product.getProductCategory().getCode());
-    }
-
-    public ProductResponse getProductResponseById(Long id) {
-        return convertToProductResponse(findById(id));
+        List<Long> adsId = product.getAds().stream().map(Ad::getId).toList();
+        return new ProductResponse(product.getId(), product.getName(), product.getProductCategory().getCode(), adsId);
     }
 
 }

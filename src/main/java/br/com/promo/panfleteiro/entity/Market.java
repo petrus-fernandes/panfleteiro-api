@@ -20,6 +20,8 @@ public class Market implements Serializable {
     @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_market", value = ConstraintMode.CONSTRAINT))
     private Location location;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Flyer> flyers = new ArrayList<>();
 
     public Market(String name, Location location) {
         this.name = name;
@@ -51,5 +53,21 @@ public class Market implements Serializable {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public List<Flyer> getFlyers() {
+        return flyers;
+    }
+
+    public void setFlyers(List<Flyer> flyers) {
+        this.flyers = flyers;
+    }
+
+    public void addFlyer(Flyer flyer) {
+        flyers.add(flyer);
+    }
+
+    public void removeFlyer(Flyer flyer) {
+        flyers.remove(flyer);
     }
 }

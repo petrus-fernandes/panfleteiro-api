@@ -60,6 +60,5 @@ public class MarketLocationHelper {
     public Location getLocationWithAddress(String address) {
         return geocodingApiService.getLocationWithAddress(address);
     }
-
 }
 

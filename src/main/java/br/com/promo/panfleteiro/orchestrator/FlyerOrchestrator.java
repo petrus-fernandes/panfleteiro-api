@@ -1,12 +1,15 @@
 package br.com.promo.panfleteiro.orchestrator;
 
+import br.com.promo.panfleteiro.context.FlyerSectionContext;
 import br.com.promo.panfleteiro.entity.*;
 import br.com.promo.panfleteiro.request.AdRequest;
 import br.com.promo.panfleteiro.request.FlyerRequest;
 import br.com.promo.panfleteiro.request.FlyerSectionRequest;
 import br.com.promo.panfleteiro.service.*;
+import br.com.promo.panfleteiro.strategy.AdRequestStrategy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,47 +26,28 @@ public class FlyerOrchestrator {
 
     private final ProductService productService;
 
+    private final FlyerSectionContext context;
 
-    public FlyerOrchestrator(AdService adService, FlyerService flyerService, MarketService marketService, FlyerSectionService flyerSectionService, ProductService productService) {
+
+    public FlyerOrchestrator(AdService adService, FlyerService flyerService, MarketService marketService, FlyerSectionService flyerSectionService, ProductService productService, FlyerSectionContext context) {
         this.adService = adService;
         this.flyerService = flyerService;
         this.marketService = marketService;
         this.flyerSectionService = flyerSectionService;
         this.productService = productService;
-    }
-
-    public FlyerSection createFlyerSectionWithAds(FlyerSectionRequest flyerSectionRequest) {
-        FlyerSection flyerSection = flyerSectionService.create(flyerSectionRequest);
-        Flyer flyer = flyerService.findById(flyerSectionRequest.getFlyerId());
-        List<Market> markets = flyerSectionRequest.getMarketsId().stream().map(marketService::findById).collect(Collectors.toList());
-
-        List<Ad> ads = flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
-
-        flyerSection.setFlyer(flyer);
-        flyerSection.setMarkets(markets);
-
-        ads.forEach(ad -> {
-            flyerSection.addAd(ad);
-            adService.saveAd(ad);
-        });
-
-        return flyerSectionService.save(flyerSection);
+        this.context = context;
     }
 
     public FlyerSection createFlyerSection(FlyerSectionRequest flyerSectionRequest) {
-        FlyerSection flyerSection = flyerSectionService.create(flyerSectionRequest);
+        List<Ad> ads = getAdsWithStrategy(flyerSectionRequest);
         Flyer flyer = flyerService.findById(flyerSectionRequest.getFlyerId());
         List<Market> markets = flyerSectionRequest.getMarketsId().stream().map(marketService::findById).collect(Collectors.toList());
 
-        List<Ad> ads = flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
-
-        flyerSection.setFlyer(flyer);
+        FlyerSection flyerSection = flyerSectionService.create(flyerSectionRequest);
+        flyer.addFlyerSection(flyerSection);
         flyerSection.setMarkets(markets);
 
-        ads.forEach(ad -> {
-            flyerSection.addAd(ad);
-            adService.saveAd(ad);
-        });
+        ads.forEach(flyerSection::addAd);
 
         return flyerSectionService.save(flyerSection);
     }
@@ -73,8 +57,15 @@ public class FlyerOrchestrator {
         flyerSection.setExpirationDate(flyerSectionRequest.getExpirationDate());
         flyerSection.setInitialDate(flyerSectionRequest.getInitialDate());
         flyerSection.setActive(flyerSectionRequest.getActive());
-        flyerSection.getMarkets().clear();
+
+        List<Market> marketsToRemove = new ArrayList<>(flyerSection.getMarkets());
+        marketsToRemove.forEach(flyerSection::removeMarket);
         getMarketsByIds(flyerSectionRequest.getMarketsId()).forEach(flyerSection::addMarket);
+
+        List<Ad> adsToRemove = new ArrayList<>(flyerSection.getAds());
+        adsToRemove.forEach(flyerSection::removeAd);
+        getAdsWithStrategy(flyerSectionRequest).forEach(flyerSection::addAd);
+
         return flyerSectionService.save(flyerSection);
     }
 
@@ -84,7 +75,7 @@ public class FlyerOrchestrator {
              flyerRequest.getMarketsId().stream().map(marketService::findById).forEach(flyer::addMarket);
          }
          if (flyerRequest.getFlyerSectionsId() != null && !flyerRequest.getFlyerSectionsId().isEmpty()) {
-             flyerRequest.getFlyerSectionsId().stream().map(flyerSectionService::findById).forEach(flyer::addFlyerSection);
+             flyerRequest.getFlyerSectionsId().stream().map(flyerSectionService::findById).forEach(flyerSection -> flyerSection.addFlyer(flyer));
          }
 
          return flyerService.save(flyer);
@@ -95,20 +86,23 @@ public class FlyerOrchestrator {
         flyer.setExpirationDate(flyerRequest.getExpirationDate());
         flyer.setInitialDate(flyerRequest.getInitialDate());
         flyer.setActive(flyerRequest.getActive());
-        flyer.getFlyerSections().clear();
-        flyer.getMarkets().clear();
 
-        if (flyerRequest.getFlyerSectionsId() != null && !flyerRequest.getFlyerSectionsId().isEmpty()) {
-            getFlyerSectionsByIds(flyerRequest.getFlyerSectionsId()).forEach(flyer::addFlyerSection);
+        if (flyerRequest.getFlyerSectionsId() != null) {
+            List<FlyerSection> flyerSectionsToRemove = new ArrayList<>(flyer.getFlyerSections());
+            flyerSectionsToRemove.forEach(flyer::removeFlyerSection);
+            getFlyerSectionsById(flyerRequest.getFlyerSectionsId()).forEach(flyer::addFlyerSection);
         }
 
-        if (flyerRequest.getMarketsId() != null && !flyerRequest.getMarketsId().isEmpty()) {
+        if (flyerRequest.getMarketsId() != null) {
+            List<Market> marketsToRemove = new ArrayList<>(flyer.getMarkets());
+            marketsToRemove.forEach(flyer::removeMarket);
             getMarketsByIds(flyerRequest.getMarketsId()).forEach(flyer::addMarket);
         }
+
         return flyerService.save(flyer);
     }
 
-    private List<FlyerSection> getFlyerSectionsByIds(List<Long> flyerSectionsId) {
+    private List<FlyerSection> getFlyerSectionsById(List<Long> flyerSectionsId) {
         return flyerSectionsId.stream().map(flyerSectionService::findById).collect(Collectors.toList());
     }
 
@@ -117,8 +111,9 @@ public class FlyerOrchestrator {
     }
 
     public Ad createAd(AdRequest adRequest) {
+        Product product = productService.findById(adRequest.getProductId());
         Ad ad = adService.create(adRequest);
-        ad.setProduct(productService.findById(adRequest.getProductId()));
+        ad.setProduct(product);
         if (adRequest.getFlyerSectionId() != null) {
             FlyerSection flyerSection = flyerSectionService.findById(adRequest.getFlyerSectionId());
             flyerSection.addAd(ad);
@@ -141,4 +136,19 @@ public class FlyerOrchestrator {
         ad.setUrl(adRequest.getUrl());
         return adService.saveAd(ad);
     }
+
+    private List<Ad> getAdsWithStrategy(FlyerSectionRequest flyerSectionRequest) {
+        if (context.getStrategy(flyerSectionRequest) instanceof AdRequestStrategy) {
+            return flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
+        }
+        return flyerSectionRequest.getAdsId().stream().map(adService::findById).collect(Collectors.toList());
+    }
+
+    public void deleteAd(Long id) {
+        Ad ad = adService.findById(id);
+        ad.removeFlyerSection();
+        ad.removeProduct();
+        adService.delete(ad);
+    }
+
 }

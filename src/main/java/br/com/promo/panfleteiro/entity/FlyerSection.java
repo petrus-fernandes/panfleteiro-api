@@ -15,11 +15,11 @@ public class FlyerSection implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "flyer_id")
     private Flyer flyer;
 
-    @OneToMany(mappedBy = "flyerSection", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "flyerSection", cascade = CascadeType.ALL)
     private List<Ad> ads = new ArrayList<>();
 
     private Date expirationDate;
@@ -47,7 +47,6 @@ public class FlyerSection implements Serializable {
     }
 
     public void setFlyer(Flyer flyer) {
-        flyer.addFlyerSection(this);
         this.flyer = flyer;
     }
 
@@ -107,5 +106,15 @@ public class FlyerSection implements Serializable {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public void addFlyer(Flyer flyer) {
+        flyer.addFlyerSection(this);
+        this.flyer = flyer;
+    }
+
+    public void removeFlyer(Flyer flyer) {
+        flyer.removeFlyerSection(this);
+        this.flyer = null;
     }
 }

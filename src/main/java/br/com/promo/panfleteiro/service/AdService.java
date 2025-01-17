@@ -43,30 +43,11 @@ public class AdService {
     }
 
     public List<AdResponse> list() {
-        Sort.by("name").ascending();
-        List<AdResponse> response = new LinkedList<>();
-        adRepository.findAll().forEach(it -> response.add(convertToAdResponse(it)));
-        return response;
+        return adRepository.findAll().stream().map(this::convertToAdResponse).collect(Collectors.toList());
     }
     
-    public List<AdResponse> update(AdRequest adRequest) {
-        adRepository.save(convertToAd(adRequest));
-        return list();
-    }
-    
-    public List<AdResponse> delete(Long id) {
-        adRepository.deleteById(id);
-        return list();
-    }
-
-    public Ad convertToAd(AdRequest adRequest) {
-        Ad ad = new Ad();
-        ad.setFlyerSection(adFlyerSectionHelper.findFlyerSectionById(adRequest.getFlyerSectionId()));
-        ad.setProduct(productService.findById(adRequest.getProductId()));
-        ad.setPrice(adRequest.getPrice());
-        ad.setActive(adRequest.getActive());
-        ad.setUrl(adRequest.getUrl());
-        return ad;
+    public void delete(Ad ad) {
+        adRepository.delete(ad);
     }
 
     public AdResponse convertToAdResponse(Ad ad) {

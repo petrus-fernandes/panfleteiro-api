@@ -8,12 +8,13 @@ public class ProductResponse {
     private Long id;
     private String name;
     private Integer productCategory;
-    private List<AdResponse> ads = new ArrayList<>();
+    private List<Long> adsId = new ArrayList<>();
 
-    public ProductResponse(Long id, String name, Integer productCategory) {
+    public ProductResponse(Long id, String name, Integer productCategory, List<Long> adsId) {
         this.id = id;
         this.name = name;
         this.productCategory = productCategory;
+        this.adsId = adsId;
     }
 
     public Long getId() {
@@ -40,12 +41,12 @@ public class ProductResponse {
         this.productCategory = productCategory;
     }
 
-    public List<AdResponse> getAds() {
-        return ads;
+    public List<Long> getAdsId() {
+        return adsId;
     }
 
-    public void setAds(List<AdResponse> ads) {
-        this.ads = ads;
+    public void setAdsId(List<Long> adsId) {
+        this.adsId = adsId;
     }
 }
 

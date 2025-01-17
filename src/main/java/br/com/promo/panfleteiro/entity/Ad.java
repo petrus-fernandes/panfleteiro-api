@@ -25,7 +25,7 @@ public class Ad implements Serializable {
 
     private BigDecimal price;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "flyer_section_id")
     private FlyerSection flyerSection;
 
@@ -96,5 +96,10 @@ public class Ad implements Serializable {
     public void removeProduct() {
         this.product.removeAd(this);
         this.product = null;
+    }
+
+    public void removeFlyerSection() {
+        this.flyerSection.removeAd(this);
+        this.flyerSection = null;
     }
 }

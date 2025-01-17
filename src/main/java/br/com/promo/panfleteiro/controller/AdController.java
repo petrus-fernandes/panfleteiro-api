@@ -51,7 +51,7 @@ public class AdController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        adService.delete(id);
+        flyerOrchestrator.deleteAd(id);
         return ResponseEntity.noContent().build();
     }
 

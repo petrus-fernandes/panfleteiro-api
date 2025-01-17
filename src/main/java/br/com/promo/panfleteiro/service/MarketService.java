@@ -16,8 +16,8 @@ import br.com.promo.panfleteiro.response.MarketResponse;
 @Service
 public class MarketService {
 
-    private MarketRepository marketRepository;
-    private MarketLocationHelper marketLocationHelper;
+    private final MarketRepository marketRepository;
+    private final MarketLocationHelper marketLocationHelper;
 
     public MarketService(MarketRepository marketRepository, MarketLocationHelper marketLocationHelper) {
         this.marketRepository = marketRepository;
