@@ -43,7 +43,6 @@ jobs:
           REMOTE_HOST: ${{ secrets.EC2_HOST }}
           REMOTE_USER: ${{ secrets.EC2_USER }}
           TARGET: "/home/ec2-user/app/panfleteiro.jar"
-          EXCLUDE: "/dist/, /node_modules/, **.env, rebuild_app.sh, watcher.sh"
 
       - name: Restart application on EC2
         uses: appleboy/ssh-action@v0.1.10
