@@ -19,10 +19,13 @@ jobs:
           distribution: 'corretto'
 
       - name: Build with Maven
-        run: mvn clean package -X
+        run: mvn clean package
 
-      - name: List JAR file
-        run: ls -l target/
+      - name: Configure environment variables
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: Get JAR file name from POM
         id: get-jar-name
