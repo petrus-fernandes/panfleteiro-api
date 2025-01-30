@@ -53,6 +53,10 @@ jobs:
           source: "target/panfleteiro-0.0.1-SNAPSHOT.jar"
           target: "/home/ec2-user/app/panfleteiro.jar"
 
+      - name: Deploy to EC2
+        run: |
+          echo "put target/panfleteiro-0.0.1-SNAPSHOT.jar /home/ec2-user/app/panfleteiro.jar" | sftp -i ${{ secrets.EC2_SSH_KEY }} ec2-user@${{ secrets.EC2_HOST }}
+
       - name: Restart application on EC2
         uses: appleboy/ssh-action@v0.1.10
         with:
