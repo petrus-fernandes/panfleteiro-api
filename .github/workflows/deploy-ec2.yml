@@ -22,7 +22,7 @@ jobs:
         run: mvn clean package
 
       - name: List JAR file
-        run: ls -l app/target/
+        run: ls -l target/
 
       - name: Get JAR file name from POM
         id: get-jar-name
