@@ -28,6 +28,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
+          touch src/main/resources/application.properties
           echo "spring.datasource.url=$DB_URL" >> src/main/resources/application.properties
           echo "spring.datasource.username=$DB_USER" >> src/main/resources/application.properties
           echo "spring.datasource.password=$DB_PASSWORD" >> src/main/resources/application.properties
