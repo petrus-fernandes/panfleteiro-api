@@ -21,19 +21,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Configure environment variables
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-        run: |
-          touch src/main/resources/application.properties
-          echo "spring.datasource.url=$DB_URL" >> src/main/resources/application.properties
-          echo "spring.datasource.username=$DB_USER" >> src/main/resources/application.properties
-          echo "spring.datasource.password=$DB_PASSWORD" >> src/main/resources/application.properties
-          echo "google.api.key=$GOOGLE_API_KEY" >> src/main/resources/application.properties
-
       - name: Get JAR file name from POM
         id: get-jar-name
         run: |
