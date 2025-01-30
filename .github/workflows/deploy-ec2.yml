@@ -37,7 +37,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "${{ steps.get-jar-name.outputs.FINAL_NAME }}.jar"
+          source: "app/target/${{ steps.get-jar-name.outputs.FINAL_NAME }}.jar"
           target: "/home/ec2-user/app/"
 
       - name: Restart application on EC2
