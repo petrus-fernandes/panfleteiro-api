@@ -11,6 +11,6 @@ import org.springframework.data.repository.query.Param;
 public interface AdRepository extends JpaRepository<Ad, Long> {
 
 
-    @Query("SELECT a FROM Ad a WHERE a.product.name = :productName")
+    @Query("SELECT a FROM Ad a WHERE UPPER(a.product.name) LIKE UPPER(CONCAT('%', :productName, '%'))")
     Page<Ad> findAdsByProductName(@Param("productName") String productName, Pageable pageable);
 }

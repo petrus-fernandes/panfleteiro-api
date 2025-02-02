@@ -41,6 +41,7 @@ public class FlyerOrchestrator {
     public FlyerSection createFlyerSection(FlyerSectionRequest flyerSectionRequest) {
         List<Ad> ads = getAdsWithStrategy(flyerSectionRequest);
         Flyer flyer = flyerService.findById(flyerSectionRequest.getFlyerId());
+
         List<Market> markets = flyerSectionRequest.getMarketsId().stream().map(marketService::findById).collect(Collectors.toList());
 
         FlyerSection flyerSection = flyerSectionService.create(flyerSectionRequest);
@@ -137,13 +138,6 @@ public class FlyerOrchestrator {
         return adService.saveAd(ad);
     }
 
-    private List<Ad> getAdsWithStrategy(FlyerSectionRequest flyerSectionRequest) {
-        if (context.getStrategy(flyerSectionRequest) instanceof AdRequestStrategy) {
-            return flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
-        }
-        return flyerSectionRequest.getAdsId().stream().map(adService::findById).collect(Collectors.toList());
-    }
-
     public void deleteAd(Long id) {
         Ad ad = adService.findById(id);
         ad.removeFlyerSection();
@@ -151,4 +145,10 @@ public class FlyerOrchestrator {
         adService.delete(ad);
     }
 
+    private List<Ad> getAdsWithStrategy(FlyerSectionRequest flyerSectionRequest) {
+        if (context.getStrategy(flyerSectionRequest) instanceof AdRequestStrategy) {
+            return flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
+        }
+        return flyerSectionRequest.getAdsId().stream().map(adService::findById).collect(Collectors.toList());
+    }
 }

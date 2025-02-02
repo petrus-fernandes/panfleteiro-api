@@ -56,9 +56,10 @@ public class AdController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Ad>> searchAdsByProductName(@RequestParam String productName, @RequestParam int page, @RequestParam int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("title").ascending());
+    public ResponseEntity<Page<AdResponse>> searchAdsByProductName(@RequestParam String productName, @RequestParam int page, @RequestParam int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("active", "product.name").ascending());
         Page<Ad> adsPage = adService.findAdsByProductName(productName, pageable);
-        return ResponseEntity.ok(adsPage);
+        Page<AdResponse> adsResponsePage = adsPage.map(adService::convertToAdResponse);
+        return ResponseEntity.ok(adsResponsePage);
     }
 }
