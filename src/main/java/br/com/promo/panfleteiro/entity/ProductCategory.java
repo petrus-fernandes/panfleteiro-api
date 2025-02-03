@@ -15,7 +15,7 @@ public enum ProductCategory {
 
     final private String name;
 
-    private ProductCategory(Integer code, String name) {
+    ProductCategory(Integer code, String name) {
         this.code = code;
         this.name = name;
     }

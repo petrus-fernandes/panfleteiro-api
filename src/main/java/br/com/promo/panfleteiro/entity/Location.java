@@ -5,8 +5,6 @@ import static java.lang.Math.sin;
 import static java.lang.Math.acos;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -78,7 +76,22 @@ public class Location implements Serializable {
         this.active = active;
     }
 
-    public Double calculateDistanceInKm(Location location) {
-        return 6371.0 * acos(sin(location.latitude) * sin(this.latitude) + cos(location.latitude) * cos(this.latitude) * cos(location.longitude - this.longitude));
+    public Double calculateDistanceInKm(Double latitude, Double longitude) {
+        double lat1Rad = Math.toRadians(this.latitude);
+        double lon1Rad = Math.toRadians(this.longitude);
+        double lat2Rad = Math.toRadians(latitude);
+        double lon2Rad = Math.toRadians(longitude);
+
+        double deltaLat = lat2Rad - lat1Rad;
+        double deltaLon = lon2Rad - lon1Rad;
+
+        double a = Math.pow(Math.sin(deltaLat / 2), 2) +
+                Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                        Math.pow(Math.sin(deltaLon / 2), 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return 6371 * c;
+
     }
 }

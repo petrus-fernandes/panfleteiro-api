@@ -1,13 +1,14 @@
 package br.com.promo.panfleteiro.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import br.com.promo.panfleteiro.orchestrator.FlyerOrchestrator;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.*;
+import org.springframework.data.util.Streamable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,11 +56,31 @@ public class AdController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
+    @GetMapping("/buscaPorNome")
     public ResponseEntity<Page<AdResponse>> searchAdsByProductName(@RequestParam String productName, @RequestParam int page, @RequestParam int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("active", "product.name").ascending());
         Page<Ad> adsPage = adService.findAdsByProductName(productName, pageable);
         Page<AdResponse> adsResponsePage = adsPage.map(adService::convertToAdResponse);
         return ResponseEntity.ok(adsResponsePage);
+    }
+
+    @GetMapping("/buscaPorDistancia")
+    public ResponseEntity<Page<AdResponse>> searchAdsByDistance(@RequestParam Double latitude, @RequestParam Double longitude, @RequestParam Long rangeInKm, @RequestParam Integer page, @RequestParam Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
+        Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude,rangeInKm, pageable);
+        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponseList(latitude, longitude, rangeInKm, adsPage));
+        return ResponseEntity.ok(adsResponsePage);
+    }
+
+    private List<AdResponse> getAdsResponseList(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
+        return adsPage.stream().filter(ad -> ad.getFlyerSection() != null && ad.getFlyerSection().getMarkets() != null)
+                .flatMap(ad -> getAdResponseForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
+                .collect(Collectors.toList());
+    }
+
+    private Stream<AdResponse> getAdResponseForAllMarketsInRange(Long rangeInKm, Ad ad, Double latitude, Double longitude) {
+        return ad.getFlyerSection().getMarkets().stream()
+                .filter(market -> market.getLocation().calculateDistanceInKm(latitude, longitude) <= rangeInKm)
+                .map(market -> adService.convertToAdResponseWithUniqueMarketAndDistance(ad, market.getId(), market.getLocation().calculateDistanceInKm(latitude, longitude)));
     }
 }
