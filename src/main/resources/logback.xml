@@ -2,6 +2,8 @@
     <!-- Define o padrão de log -->
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>
 
+    <property name="LOG_DIR" value="${LOG_DIR:-logs}" />
+
     <!-- Appender para console -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -11,11 +13,11 @@
 
     <!-- Appender para arquivo -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>../logs/application.log</file>
+        <file>${LOG_DIR}/application.log</file>
         <createDirs>true</createDirs>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- Arquivo de log rotacionado diariamente -->
-            <fileNamePattern>../logs/application.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/application.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- Mantém logs por 30 dias -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
