@@ -12,6 +12,7 @@
     <!-- Appender para arquivo -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/application.log</file>
+        <createDirs>true</createDirs>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- Arquivo de log rotacionado diariamente -->
             <fileNamePattern>logs/application.%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -30,7 +31,7 @@
     </root>
 
     <!-- Configuração específica para o pacote com.exemplo -->
-    <logger name="com.exemplo" level="DEBUG" additivity="false">
+    <logger name="br.com.promo.panfleteiro" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </logger>
