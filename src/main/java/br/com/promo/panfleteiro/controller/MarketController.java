@@ -2,6 +2,8 @@ package br.com.promo.panfleteiro.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,39 +18,50 @@ public class MarketController {
 
     private final MarketService marketService;
 
+    private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
+
     public MarketController(MarketService marketService) {
         this.marketService = marketService;
     }
 
     @GetMapping
     public ResponseEntity<List<MarketResponse>> findAll() {
+        logger.info("Listing all Markets");
         return ResponseEntity.ok(marketService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MarketResponse> findById(@PathVariable Long id) {
+        logger.info("Looking for Market with ID: {}", id);
         return ResponseEntity.ok(marketService.getMarketResponseById(id));
     }
 
     @PostMapping
     public ResponseEntity<MarketResponse> create(@RequestBody MarketRequest marketRequest) {
-        return ResponseEntity.status(201).body(marketService.create(marketRequest));
+        logger.info("Creating Market: {}", marketRequest);
+        MarketResponse marketResponse = marketService.create(marketRequest);
+        logger.info("Created Market: {}", marketResponse.getId());
+        return ResponseEntity.status(201).body(marketResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<MarketResponse> update(@PathVariable Long id, @RequestBody MarketRequest marketRequest) {
+        logger.info("Updating Market with ID: {}", id);
         return ResponseEntity.ok(marketService.update(id, marketRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        logger.info("Deleting Market with ID: {}", id);
         marketService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/nome")
     public ResponseEntity<List<MarketResponse>> findByNameContaining(@RequestParam String name) {
+        logger.info("Searching for Markets by name: {}", name);
         List<MarketResponse> markets = marketService.findByName(name);
+        logger.info("Found {} Markets by name.", markets.size());
         return ResponseEntity.ok(markets);
     }
 }
