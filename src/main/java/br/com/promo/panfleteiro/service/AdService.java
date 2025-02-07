@@ -105,4 +105,8 @@ public class AdService {
         return adRepository.findAdsByProductNameAndDistanceWithBoundingBox(boundingBox.get("minLat"), boundingBox.get("maxLat"), boundingBox.get("minLon"),
                 boundingBox.get("maxLon"), latitude, longitude, rangeInKm, productName, pageable);
     }
+
+    public List<Ad> getActiveAds() {
+        return adRepository.findByActive(true);
+    }
 }

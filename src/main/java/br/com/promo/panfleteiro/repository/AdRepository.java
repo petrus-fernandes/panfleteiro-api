@@ -8,6 +8,8 @@ import br.com.promo.panfleteiro.entity.Ad;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface AdRepository extends JpaRepository<Ad, Long> {
 
 
@@ -56,4 +58,6 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
                                                             @Param("rangeInKm") double rangeInKm,
                                                             @Param("productName") String productName,
                                                             Pageable pageable);
+
+    List<Ad> findByActive(boolean active);
 }

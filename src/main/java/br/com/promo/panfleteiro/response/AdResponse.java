@@ -2,11 +2,14 @@ package br.com.promo.panfleteiro.response;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AdResponse {
     
     private Long id;
+
+    private Long flyerSectionId;
 
     private Long productId;
 
@@ -20,7 +23,9 @@ public class AdResponse {
 
     private String url;
 
-    private Long flyerSectionId;
+    private Date initialDate;
+
+    private Date expirationDate;
 
     private List<Long> marketsId = new ArrayList<>();
 

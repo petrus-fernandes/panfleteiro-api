@@ -12,6 +12,7 @@ import br.com.promo.panfleteiro.response.FlyerResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,10 @@ public class FlyerService {
 
     public Flyer save(Flyer flyer) {
         return flyerRepository.save(flyer);
+    }
+
+    public List<Flyer> getActiveFlyers() {
+        return flyerRepository.findByActive(true);
     }
 }
 

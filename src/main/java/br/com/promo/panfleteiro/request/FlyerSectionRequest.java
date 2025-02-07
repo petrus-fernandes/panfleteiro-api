@@ -10,10 +10,11 @@ public class FlyerSectionRequest {
     private Long flyerId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private Date expirationDate;
+    private Date initialDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private Date initialDate;
+    private Date expirationDate;
+
     private List<AdRequest> ads;
 
     private List<Long> adsId;
