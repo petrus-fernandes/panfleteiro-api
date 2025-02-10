@@ -29,7 +29,7 @@ jobs:
           FINAL_NAME=$(mvn help:evaluate -Dexpression=project.build.finalName -q -DforceStdout)
           echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_OUTPUT
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_OUTPUT
+          echo "final-name=$FINAL_NAME" >> $GITHUB_OUTPUT
 
       - name: Test SSH connection
         env:
@@ -48,8 +48,8 @@ jobs:
             PRIVATE_KEY: ${{secrets.EC2_SSH_KEY}}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          echo "Project version for deploy: $steps.get-jar-name.outputs.FINAL_NAME"
-          echo "put target/$steps.get-jar-name.outputs.FINAL_NAME.jar /home/ec2-user/app/panfleteiro.jar" | sftp -i private_key ec2-user@${{secrets.EC2_HOST}}
+          echo "Project version for deploy: $get-jar-name.outputs.final-name"
+          echo "put target/$get-jar-name.outputs.FINAL_NAME.jar /home/ec2-user/app/panfleteiro.jar" | sftp -i private_key ec2-user@${{secrets.EC2_HOST}}
 
       - name: Restart application on EC2
         uses: appleboy/ssh-action@v0.1.10
