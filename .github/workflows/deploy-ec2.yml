@@ -48,8 +48,8 @@ jobs:
             PRIVATE_KEY: ${{secrets.EC2_SSH_KEY}}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          echo "Project version for deploy: $FINAL_NAME"
-          echo "put target/$FINAL_NAME.jar /home/ec2-user/app/panfleteiro.jar" | sftp -i private_key ec2-user@${{secrets.EC2_HOST}}
+          echo "Project version for deploy: $steps.get-jar-name.outputs.FINAL_NAME"
+          echo "put target/$steps.get-jar-name.outputs.FINAL_NAME.jar /home/ec2-user/app/panfleteiro.jar" | sftp -i private_key ec2-user@${{secrets.EC2_HOST}}
 
       - name: Restart application on EC2
         uses: appleboy/ssh-action@v0.1.10
