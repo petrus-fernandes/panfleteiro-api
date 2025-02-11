@@ -1,5 +1,7 @@
 package br.com.promo.panfleteiro.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 import java.util.List;
 
@@ -7,9 +9,11 @@ public class FlyerSectionResponse {
 
     private Long id;
     private Long flyerId;
-    private Date expirationDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date initialDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private Date expirationDate;
     private Boolean active;
     private List<Long> adsId;
 

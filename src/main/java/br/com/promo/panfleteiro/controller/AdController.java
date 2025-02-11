@@ -87,7 +87,7 @@ public class AdController {
         return ResponseEntity.ok(adsResponsePage);
     }
 
-    @GetMapping("/buscaPorDistancia/buscaPorNome")
+    @GetMapping("/buscaPorDistanciaENome")
     public ResponseEntity<Page<AdResponse>> searchAdsByProductNameAndDistance(@RequestParam Double latitude,
                                                                               @RequestParam Double longitude,
                                                                               @RequestParam Long rangeInKm,

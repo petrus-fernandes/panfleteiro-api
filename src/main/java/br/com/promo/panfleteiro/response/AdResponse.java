@@ -102,4 +102,20 @@ public class AdResponse {
     public void setFlyerSectionId(Long flyerSectionId) {
         this.flyerSectionId = flyerSectionId;
     }
+
+    public Date getInitialDate() {
+        return initialDate;
+    }
+
+    public void setInitialDate(Date initialDate) {
+        this.initialDate = initialDate;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
+    }
 }

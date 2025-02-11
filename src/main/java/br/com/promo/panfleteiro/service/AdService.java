@@ -1,10 +1,14 @@
 package br.com.promo.panfleteiro.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import br.com.promo.panfleteiro.entity.Market;
+import br.com.promo.panfleteiro.entity.FlyerSection;
+import br.com.promo.panfleteiro.entity.Flyer;
 import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
 import br.com.promo.panfleteiro.helper.AdFlyerSectionHelper;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +57,8 @@ public class AdService {
         if (ad.getFlyerSection() != null) {
             adResponse.setFlyerSectionId(ad.getFlyerSection().getId());
             adResponse.setMarketsId(ad.getFlyerSection().getMarkets().stream().map(Market::getId).collect(Collectors.toList()));
+            adResponse.setInitialDate(getAdInitialDate(ad));
+            adResponse.setExpirationDate(getAdExpirationDate(ad));
         }
         return adResponse;
     }
@@ -96,8 +102,28 @@ public class AdService {
         if (ad.getFlyerSection() != null) {
             adResponse.setFlyerSectionId(ad.getFlyerSection().getId());
             adResponse.setMarketsId(ad.getFlyerSection().getMarkets().stream().map(Market::getId).filter(id -> id.equals(marketId)).toList());
+            adResponse.setInitialDate(getAdInitialDate(ad));
+            adResponse.setExpirationDate(getAdExpirationDate(ad));
         }
         return adResponse;
+    }
+
+    private Date getAdExpirationDate(Ad ad) {
+        return Optional.ofNullable(ad.getFlyerSection())
+                .map(FlyerSection::getExpirationDate)
+                .orElseGet(() -> Optional.ofNullable(ad.getFlyerSection())
+                        .map(FlyerSection::getFlyer)
+                        .map(Flyer::getExpirationDate)
+                        .orElse(null));
+    }
+
+    private Date getAdInitialDate(Ad ad) {
+        return Optional.ofNullable(ad.getFlyerSection())
+                .map(FlyerSection::getInitialDate)
+                .orElseGet(() -> Optional.ofNullable(ad.getFlyerSection())
+                        .map(FlyerSection::getFlyer)
+                        .map(Flyer::getInitialDate)
+                        .orElse(null));
     }
 
     public Page<Ad> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
