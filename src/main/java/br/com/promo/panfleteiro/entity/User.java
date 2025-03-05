@@ -18,7 +18,6 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     private Long id;
-
     private String login;
 
     private String password;
@@ -40,6 +39,10 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_CLIENT"));
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     @Override
     public String getPassword() {
         return password;
@@ -48,5 +51,18 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return login;
+    }
+
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public UserRole getRole() {
+        return this.role;
     }
 }
