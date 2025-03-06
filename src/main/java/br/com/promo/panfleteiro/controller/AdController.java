@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,7 +69,7 @@ public class AdController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/buscaPorNome")
+    @GetMapping(value = "/buscaPorNome", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
     public ResponseEntity<Page<AdResponse>> searchAdsByProductName(@RequestParam String productName, @RequestParam int page, @RequestParam int size) {
         logger.info("Searching for ads by product name: {}", productName);
         Pageable pageable = PageRequest.of(page, size, Sort.by("active", "product.name").ascending());
