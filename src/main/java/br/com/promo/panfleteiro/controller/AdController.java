@@ -122,9 +122,11 @@ public class AdController {
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         return adsPage.stream().filter(ad -> ad.getFlyerSection() != null && ad.getFlyerSection().getMarkets() != null)
                 .flatMap(ad -> getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
-                .sorted(Comparator
-                        .comparing(AdResponse::getDistance)
-                        .thenComparing(AdResponse::getProductName))
+                .sorted(Comparator.comparing(AdResponse::getActive)
+                        .thenComparing(AdResponse::getDistance)
+                        .thenComparing(AdResponse::getProductName)
+                        .thenComparing(AdResponse::getExpirationDate)
+                )
                 .collect(Collectors.toList());
     }
 

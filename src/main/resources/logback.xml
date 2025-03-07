@@ -37,4 +37,16 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </logger>
+
+    <!-- Suprime logs de conexão do banco de dados -->
+    <logger name="com.mysql.cj.jdbc" level="WARN" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Se estiver usando Hibernate, suprime logs do Hibernate -->
+    <logger name="org.hibernate" level="WARN" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
 </configuration>
