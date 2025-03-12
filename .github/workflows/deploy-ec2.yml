@@ -19,7 +19,9 @@ jobs:
           distribution: 'corretto'
 
       - name: Build with Maven
-        run: mvn clean install
+        run: |
+          pwd
+          ls -la
 
       - name: Get JAR file name from POM
         id: get-jar-name
