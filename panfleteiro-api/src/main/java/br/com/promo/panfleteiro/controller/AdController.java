@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import br.com.promo.panfleteiro.job.DeactivateAllProprietiesWithExpiratedDateJob;
 import br.com.promo.panfleteiro.orchestrator.FlyerOrchestrator;
 import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;

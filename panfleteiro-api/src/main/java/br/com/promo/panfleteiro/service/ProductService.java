@@ -6,11 +6,9 @@ import br.com.promo.panfleteiro.entity.ProductCategory;
 import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
 import br.com.promo.panfleteiro.repository.ProductRepository;
 import br.com.promo.panfleteiro.request.ProductRequest;
-import br.com.promo.panfleteiro.response.AdResponse;
 import br.com.promo.panfleteiro.response.ProductResponse;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

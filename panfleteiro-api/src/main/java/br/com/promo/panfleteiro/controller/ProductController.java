@@ -1,12 +1,10 @@
 package br.com.promo.panfleteiro.controller;
 
-import br.com.promo.panfleteiro.entity.Product;
 import br.com.promo.panfleteiro.request.ProductRequest;
 import br.com.promo.panfleteiro.response.ProductResponse;
 import br.com.promo.panfleteiro.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

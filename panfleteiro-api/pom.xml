@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.promo</groupId>
-	<artifactId>panfleteiro</artifactId>
+	<artifactId>panfleteiro-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>panfleteiro</name>
-	<description>Demo project for Spring Boot</description>
+	<name>panfleteiro-api</name>
+	<description>Panfleteiro API</description>
 	<packaging>jar</packaging>
 	<url/>
 	<licenses>

@@ -9,10 +9,8 @@ import br.com.promo.panfleteiro.repository.FlyerSectionRepository;
 import br.com.promo.panfleteiro.repository.MarketRepository;
 import br.com.promo.panfleteiro.request.FlyerRequest;
 import br.com.promo.panfleteiro.response.FlyerResponse;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
