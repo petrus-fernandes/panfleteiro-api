@@ -20,7 +20,12 @@ jobs:
 
       - name: Build with Maven
         run: |
-          pwd
+          cd panfleteiro-api
+          ls -la
+          mvn clean package
+          cd ../../
+          ls -la
+          cd ../
           ls -la
 
       - name: Get JAR file name from POM
