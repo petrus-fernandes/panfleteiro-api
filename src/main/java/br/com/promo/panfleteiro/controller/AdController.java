@@ -21,7 +21,7 @@ import br.com.promo.panfleteiro.response.AdResponse;
 import br.com.promo.panfleteiro.service.AdService;
 
 @RestController
-@RequestMapping("v1/anuncios")
+@RequestMapping(path = "v1/anuncios", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 public class AdController {
 
     private final AdService adService;
