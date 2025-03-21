@@ -93,19 +93,19 @@ public class AdController {
 
 
     @GetMapping("/buscaPorDistanciaENome")
-    public ResponseEntity<Page<AdResponse>> searchAdsByProductNameAndDistance(@RequestParam Double latitude,
-                                                                              @RequestParam Double longitude,
-                                                                              @RequestParam Long rangeInKm,
-                                                                              @RequestParam String productName,
-                                                                              @RequestParam Integer page,
-                                                                              @RequestParam Integer size) {
-        logger.info("Searching for ads by product name: {} and distance: {} km using latitude: {} and longitude: {}", productName, rangeInKm, latitude, longitude);
-        Pageable pageableQuery = PageRequest.of(page, size, Sort.by("active").ascending());
-        Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude,rangeInKm, pageableQuery, productName);
-        List<AdResponse> adsResponseListSorted = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
-        List<AdResponse> paginatedList = getPaginatedList(adsResponseListSorted, (int) pageableQuery.getOffset(), pageableQuery.getPageSize());
-        Pageable pageableResponse = PageRequest.of(page, size);
-        Page<AdResponse> adsResponsePage = new PageImpl<>(paginatedList, pageableResponse, size);
+    public ResponseEntity<Page<AdResponse>> searchAdsByProductNameAndDistance(
+            @RequestParam Double latitude,
+            @RequestParam Double longitude,
+            @RequestParam Long rangeInKm,
+            @RequestParam String productName,
+            @RequestParam Integer page,
+            @RequestParam Integer size) {
+        logger.info("Searching for ads by product name: {} and distance: {} km using latitude: {} and longitude: {}",
+                productName, rangeInKm, latitude, longitude);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
+        Page<AdResponse> adsResponsePage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
+
         logger.info("Found {} ads by product name and distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }

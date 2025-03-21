@@ -13,6 +13,7 @@ import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
 import br.com.promo.panfleteiro.helper.AdFlyerSectionHelper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -126,10 +127,28 @@ public class AdService {
                         .orElse(null));
     }
 
-    public Page<Ad> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
+    public Page<AdResponse> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
         Map<String, Double> boundingBox = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
-        return adRepository.findAdsByProductNameAndDistanceWithBoundingBox(boundingBox.get("minLat"), boundingBox.get("maxLat"), boundingBox.get("minLon"),
-                boundingBox.get("maxLon"), latitude, longitude, rangeInKm, productName, pageable);
+
+        // Busca os anúncios com distâncias
+        Page<Object[]> adsWithDistance = adRepository.findAdsByProductNameAndDistanceWithBoundingBox(
+                boundingBox.get("minLat"), boundingBox.get("maxLat"),
+                boundingBox.get("minLon"), boundingBox.get("maxLon"),
+                latitude, longitude, rangeInKm, productName, pageable);
+
+        // Converte os resultados para AdResponse
+        List<AdResponse> adResponses = adsWithDistance.getContent().stream()
+                .map(result -> {
+                    Ad ad = (Ad) result[0];
+                    Double distance = (Double) result[1];
+                    AdResponse response = convertToAdResponse(ad);
+                    response.setDistance(distance); // Adiciona a distância ao AdResponse
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        // Retorna uma página de AdResponse
+        return new PageImpl<>(adResponses, pageable, adsWithDistance.getTotalElements());
     }
 
     public List<Ad> getActiveAds() {
