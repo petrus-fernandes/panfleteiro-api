@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,11 @@ import br.com.promo.panfleteiro.request.AdRequest;
 import br.com.promo.panfleteiro.response.AdResponse;
 import br.com.promo.panfleteiro.service.AdService;
 
+import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
+
 @RestController
 @RequestMapping(path = "v1/anuncios", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class AdController {
 
     private final AdService adService;
@@ -86,6 +90,7 @@ public class AdController {
         logger.info("Found {} ads by distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }
+
 
     @GetMapping("/buscaPorDistanciaENome")
     public ResponseEntity<Page<AdResponse>> searchAdsByProductNameAndDistance(@RequestParam Double latitude,

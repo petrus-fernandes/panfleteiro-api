@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           echo "Project version for deploy: ${{steps.get-jar-name.outputs.final-name}}"
-          echo "put target/${{steps.get-jar-name.outputs.final-name}}.jar /home/ec2-user/app/panfleteiro.jar" | sftp -i private_key ec2-user@${{secrets.EC2_HOST}}
+          echo "put target/${{steps.get-jar-name.outputs.final-name}}.jar /api/${{steps.get-jar-name.outputs.final-name}}.jar" | sftp -i private_key ${{secrets.EC2_USER}}@${{secrets.EC2_HOST}}
 
       - name: Restart application on EC2
         uses: appleboy/ssh-action@v0.1.10
@@ -58,5 +58,5 @@ jobs:
           username: ${{secrets.EC2_USER}}
           key: ${{secrets.EC2_SSH_KEY}}
           script: |
-            cd /home/ec2-user/app/
+            cd /home/${{secrets.EC2_USER}}/app/
             sudo systemctl restart panfleteiro.service
