@@ -32,6 +32,7 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.PUT, "/v1/auth/usuarios").hasRole("ADMIN"))
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.GET, "/v1/auth/usuarios").hasRole("ADMIN"))
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.DELETE, "/v1/auth/usuarios/**").hasRole("ADMIN"))
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.GET, "/v1/anuncios/desativarAnunciosExpirados").hasRole("ADMIN"))
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, "/v1/auth/login").permitAll())
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.GET, "/v1/anuncios/**").permitAll())
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.GET, "/v1/**").hasRole("USER"))

@@ -110,6 +110,12 @@ public class AdController {
         return ResponseEntity.ok(adsResponsePage);
     }
 
+    @GetMapping("/desativarAnunciosExpirados")
+    public ResponseEntity<Void> desativarAnunciosExpirados() {
+        flyerOrchestrator.deactivateEntitiesByExpiratedDate();
+        return ResponseEntity.noContent().build();
+    }
+
     @NotNull
     private static List<AdResponse> getPaginatedList(List<AdResponse> adsResponseListSorted, Integer offSet, Integer pageSize) {
         Integer totalElements = adsResponseListSorted.size();

@@ -1,15 +1,19 @@
 package br.com.promo.panfleteiro.orchestrator;
 
 import br.com.promo.panfleteiro.context.FlyerSectionContext;
+import br.com.promo.panfleteiro.controller.FlyerController;
 import br.com.promo.panfleteiro.entity.*;
 import br.com.promo.panfleteiro.request.AdRequest;
 import br.com.promo.panfleteiro.request.FlyerRequest;
 import br.com.promo.panfleteiro.request.FlyerSectionRequest;
 import br.com.promo.panfleteiro.service.*;
 import br.com.promo.panfleteiro.strategy.AdRequestStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,8 @@ public class FlyerOrchestrator {
     private final ProductService productService;
 
     private final FlyerSectionContext context;
+
+    private static final Logger logger = LoggerFactory.getLogger(FlyerOrchestrator.class);
 
 
     public FlyerOrchestrator(AdService adService, FlyerService flyerService, MarketService marketService, FlyerSectionService flyerSectionService, ProductService productService, FlyerSectionContext context) {
@@ -140,8 +146,13 @@ public class FlyerOrchestrator {
 
     public void deleteAd(Long id) {
         Ad ad = adService.findById(id);
-        ad.removeFlyerSection();
-        ad.removeProduct();
+        if (ad.getFlyerSection() != null) {
+            ad.removeFlyerSection();
+        }
+        
+        if (ad.getProduct() != null) {
+            ad.removeProduct();
+        }
         adService.delete(ad);
     }
 
@@ -150,5 +161,25 @@ public class FlyerOrchestrator {
             return flyerSectionRequest.getAds().stream().map(this::createAd).collect(Collectors.toList());
         }
         return flyerSectionRequest.getAdsId().stream().map(adService::findById).collect(Collectors.toList());
+    }
+
+    public void deactivateEntitiesByExpiratedDate() {
+        adService.getActiveAds().stream().filter(ad -> ad.getFlyerSection() != null && isExpirated(ad.getFlyerSection().getExpirationDate())).forEach(ad -> {
+            ad.setActive(false);
+            ad.getFlyerSection().setActive(false);
+            adService.saveAd(ad);
+            flyerSectionService.save(ad.getFlyerSection());
+            logger.info("Ad: " + ad.getId() + " expirated.");
+            logger.info("FlyerSection: " + ad.getFlyerSection().getId() + " expirated.");
+        });
+        flyerService.getActiveFlyers().stream().filter(flyer -> isExpirated(flyer.getExpirationDate())).forEach(flyer -> {
+            flyer.setActive(false);
+            flyerService.save(flyer);
+            logger.info("Flyer: " + flyer.getId() + " expirated.");
+        });
+    }
+
+    public boolean isExpirated(Date expirationDate) {
+        return expirationDate.before(new Date());
     }
 }
