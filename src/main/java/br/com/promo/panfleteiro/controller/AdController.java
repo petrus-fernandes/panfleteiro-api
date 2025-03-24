@@ -112,6 +112,7 @@ public class AdController {
 
     @GetMapping("/desativarAnunciosExpirados")
     public ResponseEntity<Void> desativarAnunciosExpirados() {
+        logger.info("Desativar Anuncios Expirados");
         flyerOrchestrator.deactivateEntitiesByExpiratedDate();
         return ResponseEntity.noContent().build();
     }
