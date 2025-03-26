@@ -37,22 +37,19 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
                                               @Param("rangeInKm") double rangeInKm,
                                               Pageable pageable);
 
-    @Query("SELECT a, " +
-            "(6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
-            "* cos(radians(l.longitude) - radians(:baseLon)) " +
-            "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) AS distance " +
-            "FROM Ad a " +
+    @Query("SELECT a FROM Ad a " +
             "JOIN a.flyerSection s " +
             "JOIN s.markets m " +
             "JOIN m.location l " +
-            "WHERE l.latitude BETWEEN :minLat AND :maxLat " +
-            "AND UPPER(a.product.name) LIKE UPPER(CONCAT('%', :productName, '%')) " +
+            "WHERE l.latitude BETWEEN :minLat AND :maxLat AND UPPER(a.product.name) LIKE UPPER(CONCAT('%', :productName, '%'))" +
             "AND l.longitude BETWEEN :minLon AND :maxLon " +
             "AND (6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
             "* cos(radians(l.longitude) - radians(:baseLon)) " +
             "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) <= :rangeInKm " +
-            "ORDER BY distance ASC, a.active ASC")
-    Page<Object[]> findAdsByProductNameAndDistanceWithBoundingBox(@Param("minLat") double minLat,
+            "ORDER BY (6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
+            "* cos(radians(l.longitude) - radians(:baseLon)) " +
+            "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) ASC")
+    Page<Ad> findAdsByProductNameAndDistanceWithBoundingBox(@Param("minLat") double minLat,
                                                                   @Param("maxLat") double maxLat,
                                                                   @Param("minLon") double minLon,
                                                                   @Param("maxLon") double maxLon,

@@ -119,19 +119,6 @@ public class AdController {
         return ResponseEntity.noContent().build();
     }
 
-    @NotNull
-    private static List<AdResponse> getPaginatedList(List<AdResponse> adsResponseListSorted, Integer offSet, Integer pageSize) {
-        Integer totalElements = adsResponseListSorted.size();
-        Integer start = offSet;
-        Integer end = Math.min((start + pageSize), totalElements);
-
-        if (start > totalElements) {
-            start = totalElements;
-            end = totalElements;
-        }
-        return adsResponseListSorted.subList(start, end);
-    }
-
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         return adsPage.stream().filter(ad -> ad.getFlyerSection() != null && ad.getFlyerSection().getMarkets() != null)
                 .flatMap(ad -> adService.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))

@@ -102,6 +102,8 @@ public class AdService {
         AdResponse adResponse = createSimpleAdResponse(ad);
         adResponse.setDistance(distance);
         if (market != null) {
+            adResponse.setMarketName(market.getName());
+            adResponse.setMarketAddress(market.getLocation().getAddress());
             adResponse.setLatitude(market.getLocation().getLatitude());
             adResponse.setLongitude(market.getLocation().getLongitude());
         }
@@ -137,16 +139,12 @@ public class AdService {
     public Page<Ad> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
         Map<String, Double> boundingBox = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
 
-        Page<Object[]> adsWithDistance = adRepository.findAdsByProductNameAndDistanceWithBoundingBox(
+        Page<Ad> adsWithDistance = adRepository.findAdsByProductNameAndDistanceWithBoundingBox(
                 boundingBox.get("minLat"), boundingBox.get("maxLat"),
                 boundingBox.get("minLon"), boundingBox.get("maxLon"),
                 latitude, longitude, rangeInKm, productName, pageable);
 
-        List<Ad> ads = adsWithDistance.getContent().stream()
-                .map(result -> (Ad) result[0])
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(ads, pageable, adsWithDistance.getTotalElements());
+        return adsWithDistance;
     }
 
     public List<Ad> getActiveAds() {

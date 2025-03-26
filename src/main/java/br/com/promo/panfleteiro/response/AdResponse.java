@@ -27,6 +27,10 @@ public class AdResponse {
 
     private Boolean active;
 
+    private String marketName;
+
+    private String marketAddress;
+
     private String url;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -141,5 +145,21 @@ public class AdResponse {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getMarketName() {
+        return marketName;
+    }
+
+    public void setMarketName(String marketName) {
+        this.marketName = marketName;
+    }
+
+    public String getMarketAddress() {
+        return marketAddress;
+    }
+
+    public void setMarketAddress(String marketAddress) {
+        this.marketAddress = marketAddress;
     }
 }
