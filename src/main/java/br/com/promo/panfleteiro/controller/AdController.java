@@ -104,7 +104,9 @@ public class AdController {
                 productName, rangeInKm, latitude, longitude);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
-        Page<AdResponse> adsResponsePage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
+        Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
+
+        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage));
 
         logger.info("Found {} ads by product name and distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
@@ -132,18 +134,12 @@ public class AdController {
 
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         return adsPage.stream().filter(ad -> ad.getFlyerSection() != null && ad.getFlyerSection().getMarkets() != null)
-                .flatMap(ad -> getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
+                .flatMap(ad -> adService.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
                 .sorted(Comparator.comparing(AdResponse::getActive)
                         .thenComparing(AdResponse::getDistance)
                         .thenComparing(AdResponse::getProductName)
                         .thenComparing(AdResponse::getExpirationDate)
                 )
                 .collect(Collectors.toList());
-    }
-
-    private Stream<AdResponse> getAdResponseStreamForAllMarketsInRange(Long rangeInKm, Ad ad, Double latitude, Double longitude) {
-        return ad.getFlyerSection().getMarkets().stream()
-                .filter(market -> market.getLocation().calculateDistanceInKm(latitude, longitude) <= rangeInKm)
-                .map(market -> adService.convertToAdResponseWithUniqueMarketAndDistance(ad, market.getId(), market.getLocation().calculateDistanceInKm(latitude, longitude)));
     }
 }

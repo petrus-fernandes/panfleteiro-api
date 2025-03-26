@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import br.com.promo.panfleteiro.entity.Market;
 import br.com.promo.panfleteiro.entity.FlyerSection;
@@ -97,12 +98,18 @@ public class AdService {
         return adRepository.findAdsByDistanceWithBoundingBox(boundingBox.get("minLat"), boundingBox.get("maxLat"), boundingBox.get("minLon"),
                 boundingBox.get("maxLon"), latitude, longitude, rangeInKm, pageable);
     }
-    public AdResponse convertToAdResponseWithUniqueMarketAndDistance(Ad ad, Long marketId, Double distance) {
+    public AdResponse convertToAdResponseWithUniqueMarketAndDistance(Ad ad, Market market, Double distance) {
         AdResponse adResponse = createSimpleAdResponse(ad);
         adResponse.setDistance(distance);
+        if (market != null) {
+            adResponse.setLatitude(market.getLocation().getLatitude());
+            adResponse.setLongitude(market.getLocation().getLongitude());
+        }
         if (ad.getFlyerSection() != null) {
             adResponse.setFlyerSectionId(ad.getFlyerSection().getId());
-            adResponse.setMarketsId(ad.getFlyerSection().getMarkets().stream().map(Market::getId).filter(id -> id.equals(marketId)).toList());
+            if (market != null) {
+                adResponse.setMarketsId(ad.getFlyerSection().getMarkets().stream().map(Market::getId).filter(id -> id.equals(market.getId())).toList());
+            }
             adResponse.setInitialDate(getAdInitialDate(ad));
             adResponse.setExpirationDate(getAdExpirationDate(ad));
         }
@@ -127,31 +134,28 @@ public class AdService {
                         .orElse(null));
     }
 
-    public Page<AdResponse> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
+    public Page<Ad> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
         Map<String, Double> boundingBox = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
 
-        // Busca os anúncios com distâncias
         Page<Object[]> adsWithDistance = adRepository.findAdsByProductNameAndDistanceWithBoundingBox(
                 boundingBox.get("minLat"), boundingBox.get("maxLat"),
                 boundingBox.get("minLon"), boundingBox.get("maxLon"),
                 latitude, longitude, rangeInKm, productName, pageable);
 
-        // Converte os resultados para AdResponse
-        List<AdResponse> adResponses = adsWithDistance.getContent().stream()
-                .map(result -> {
-                    Ad ad = (Ad) result[0];
-                    Double distance = (Double) result[1];
-                    AdResponse response = convertToAdResponse(ad);
-                    response.setDistance(distance); // Adiciona a distância ao AdResponse
-                    return response;
-                })
+        List<Ad> ads = adsWithDistance.getContent().stream()
+                .map(result -> (Ad) result[0])
                 .collect(Collectors.toList());
 
-        // Retorna uma página de AdResponse
-        return new PageImpl<>(adResponses, pageable, adsWithDistance.getTotalElements());
+        return new PageImpl<>(ads, pageable, adsWithDistance.getTotalElements());
     }
 
     public List<Ad> getActiveAds() {
         return adRepository.findByActive(true);
+    }
+
+    public Stream<AdResponse> getAdResponseStreamForAllMarketsInRange(Long rangeInKm, Ad ad, Double latitude, Double longitude) {
+        return ad.getFlyerSection().getMarkets().stream()
+                .filter(market -> market.getLocation().calculateDistanceInKm(latitude, longitude) <= rangeInKm)
+                .map(market -> convertToAdResponseWithUniqueMarketAndDistance(ad, market, market.getLocation().calculateDistanceInKm(latitude, longitude)));
     }
 }
