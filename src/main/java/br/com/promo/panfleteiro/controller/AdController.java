@@ -3,7 +3,6 @@ package br.com.promo.panfleteiro.controller;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import br.com.promo.panfleteiro.orchestrator.FlyerOrchestrator;
 import jakarta.validation.Valid;
@@ -82,12 +81,19 @@ public class AdController {
     }
 
     @GetMapping("/buscaPorDistancia")
-    public ResponseEntity<Page<AdResponse>> searchAdsByDistance(@RequestParam Double latitude, @RequestParam Double longitude, @RequestParam Long rangeInKm, @RequestParam Integer page, @RequestParam Integer size) {
+    public ResponseEntity<Page<AdResponse>> searchAdsByDistance(
+            @RequestParam Double latitude,
+            @RequestParam Double longitude,
+            @RequestParam Long rangeInKm,
+            @RequestParam Integer page,
+            @RequestParam Integer size) {
         logger.info("Searching for ads by distance: {} km using latitude: {} and longitude: {}", rangeInKm, latitude, longitude);
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
         Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude,rangeInKm, pageable);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
-        Page<AdResponse> adsResponsePage = new PageImpl<>(adsResponseList, pageable, adsResponseList.size());
+        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponse(page, size, adsResponseList), pageable, adsResponseList.size());
+
         logger.info("Found {} ads by distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }
@@ -102,16 +108,22 @@ public class AdController {
             @RequestParam Integer page,
             @RequestParam Integer size) {
         logger.info("Searching for ads by product name: {} and distance: {} km using latitude: {} and longitude: {}",
-                productName, rangeInKm, latitude, longitude);
+            productName, rangeInKm, latitude, longitude);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
         Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
-
-        Page<AdResponse> adsResponsePage = new PageImpl<>(adsResponseList, pageable, adsResponseList.size());
+        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponse(page, size, adsResponseList), pageable, adsResponseList.size());
 
         logger.info("Found {} ads by product name and distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
+    }
+
+    @NotNull
+    private static List<AdResponse> getAdsResponse(Integer page, Integer size, List<AdResponse> adsResponseList) {
+        int start = page * size;
+        int end = Math.min(start + size, adsResponseList.size());
+        return adsResponseList.subList(start, end);
     }
 
     @GetMapping("/desativarAnunciosExpirados")
