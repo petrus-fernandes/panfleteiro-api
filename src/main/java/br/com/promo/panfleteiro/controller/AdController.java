@@ -86,7 +86,8 @@ public class AdController {
         logger.info("Searching for ads by distance: {} km using latitude: {} and longitude: {}", rangeInKm, latitude, longitude);
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
         Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude,rangeInKm, pageable);
-        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage));
+        List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
+        Page<AdResponse> adsResponsePage = new PageImpl<>(adsResponseList, pageable, adsResponseList.size());
         logger.info("Found {} ads by distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }
@@ -105,8 +106,9 @@ public class AdController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
         Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
+        List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
 
-        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage));
+        Page<AdResponse> adsResponsePage = new PageImpl<>(adsResponseList, pageable, adsResponseList.size());
 
         logger.info("Found {} ads by product name and distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
