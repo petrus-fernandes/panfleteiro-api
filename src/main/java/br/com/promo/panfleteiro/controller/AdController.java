@@ -90,7 +90,7 @@ public class AdController {
         logger.info("Searching for ads by distance: {} km using latitude: {} and longitude: {}", rangeInKm, latitude, longitude);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
-        Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude,rangeInKm, pageable);
+        Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude, rangeInKm, pageable);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
         Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponse(page, size, adsResponseList), pageable, adsResponseList.size());
 
@@ -108,7 +108,7 @@ public class AdController {
             @RequestParam Integer page,
             @RequestParam Integer size) {
         logger.info("Searching for ads by product name: {} and distance: {} km using latitude: {} and longitude: {}",
-            productName, rangeInKm, latitude, longitude);
+                productName, rangeInKm, latitude, longitude);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
         Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
@@ -136,11 +136,10 @@ public class AdController {
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         return adsPage.stream().filter(ad -> ad.getFlyerSection() != null && ad.getFlyerSection().getMarkets() != null)
                 .flatMap(ad -> adService.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
-                .sorted(Comparator.comparing(AdResponse::getActive)
-                        .thenComparing(AdResponse::getDistance)
-                        .thenComparing(AdResponse::getProductName)
-                        .thenComparing(AdResponse::getExpirationDate)
-                )
-                .collect(Collectors.toList());
+                .sorted(Comparator.comparing(AdResponse::getActive).reversed()
+                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
+                                .thenComparing(AdResponse::getDistance)
+                                .thenComparing(AdResponse::getProductName)
+                        )).collect(Collectors.toList());
     }
 }
