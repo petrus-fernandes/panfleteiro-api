@@ -1,4 +1,4 @@
-package br.com.promo.panfleteiro.controller;
+package br.com.promo.panfleteiro.controller.v1;
 
 import java.util.Comparator;
 import java.util.List;

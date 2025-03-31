@@ -1,7 +1,6 @@
 package br.com.promo.panfleteiro.orchestrator;
 
 import br.com.promo.panfleteiro.context.FlyerSectionContext;
-import br.com.promo.panfleteiro.controller.FlyerController;
 import br.com.promo.panfleteiro.entity.*;
 import br.com.promo.panfleteiro.request.AdRequest;
 import br.com.promo.panfleteiro.request.FlyerRequest;

@@ -1,4 +1,4 @@
-package br.com.promo.panfleteiro.controller;
+package br.com.promo.panfleteiro.controller.v1;
 
 import br.com.promo.panfleteiro.entity.User;
 import br.com.promo.panfleteiro.infra.security.TokenService;
