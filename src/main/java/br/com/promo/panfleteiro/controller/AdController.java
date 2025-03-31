@@ -92,7 +92,7 @@ public class AdController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
         Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude, rangeInKm, pageable);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
-        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponse(page, size, adsResponseList), pageable, adsResponseList.size());
+        Page<AdResponse> adsResponsePage = new PageImpl<>(manualPageableAdResponse(page, size, adsResponseList), pageable, adsResponseList.size());
 
         logger.info("Found {} ads by distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
@@ -113,14 +113,14 @@ public class AdController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
         Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
-        Page<AdResponse> adsResponsePage = new PageImpl<>(getAdsResponse(page, size, adsResponseList), pageable, adsResponseList.size());
+        Page<AdResponse> adsResponsePage = new PageImpl<>(manualPageableAdResponse(page, size, adsResponseList), pageable, adsResponseList.size());
 
         logger.info("Found {} ads by product name and distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }
 
     @NotNull
-    private static List<AdResponse> getAdsResponse(Integer page, Integer size, List<AdResponse> adsResponseList) {
+    private static List<AdResponse> manualPageableAdResponse(Integer page, Integer size, List<AdResponse> adsResponseList) {
         int start = page * size;
         int end = Math.min(start + size, adsResponseList.size());
         return adsResponseList.subList(start, end);
@@ -136,7 +136,7 @@ public class AdController {
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         return adsPage.stream().filter(ad -> ad.getFlyerSection() != null && ad.getFlyerSection().getMarkets() != null)
                 .flatMap(ad -> adService.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
-                .sorted(Comparator.comparing(AdResponse::getActive).reversed()
+                .sorted(Comparator.comparing(AdResponse::getActive)
                         .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                                 .thenComparing(AdResponse::getDistance)
                                 .thenComparing(AdResponse::getProductName)
