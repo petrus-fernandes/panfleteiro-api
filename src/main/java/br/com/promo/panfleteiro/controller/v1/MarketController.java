@@ -2,8 +2,10 @@ package br.com.promo.panfleteiro.controller.v1;
 
 import java.util.List;
 
+import br.com.promo.panfleteiro.helper.AdMarketHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +17,13 @@ import br.com.promo.panfleteiro.service.MarketService;
 @RequestMapping("/v1/mercados")
 public class MarketController {
 
-    private final MarketService marketService;
-
     private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
 
-    public MarketController(MarketService marketService) {
-        this.marketService = marketService;
-    }
+    @Autowired
+    private AdMarketHelper adMarketHelper;
+
+    @Autowired
+    private MarketService marketService;
 
     @GetMapping
     public ResponseEntity<List<MarketResponse>> findAll() {
@@ -32,7 +34,7 @@ public class MarketController {
     @GetMapping("/{id}")
     public ResponseEntity<MarketResponse> findById(@PathVariable Long id) {
         logger.info("Looking for Market with ID: {}", id);
-        return ResponseEntity.ok(marketService.getMarketResponseById(id));
+        return ResponseEntity.ok(adMarketHelper.getMarketResponseById(id));
     }
 
     @PostMapping

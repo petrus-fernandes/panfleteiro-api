@@ -59,10 +59,6 @@ public class MarketService {
         marketRepository.delete(market);
     }
 
-    public MarketResponse getMarketResponseById(Long id){
-        return marketLocationHelper.convertMarketToResponse(findById(id));
-    }
-
     public List<MarketResponse> findByName(String name) {
         return marketRepository.findByNameContainingIgnoreCase(name).stream().map(marketLocationHelper::convertMarketToResponse).toList();
     }

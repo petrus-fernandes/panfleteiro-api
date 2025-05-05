@@ -2,6 +2,8 @@ package br.com.promo.panfleteiro.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -13,9 +15,9 @@ public class Ad implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private String productName;
+
+    private ProductCategory productCategory;
 
     private String url;
 
@@ -23,16 +25,17 @@ public class Ad implements Serializable {
 
     private BigDecimal price;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "flyer_section_id")
-    private FlyerSection flyerSection;
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Market> markets;
 
-    public Ad(Product product, String url, Boolean active, BigDecimal price, FlyerSection flyerSection) {
-        this.product = product;
+    private Date initialDate;
+
+    private Date expirationDate;
+
+    public Ad(String url, Boolean active, BigDecimal price) {
         this.url = url;
         this.active = active;
         this.price = price;
-        this.flyerSection = flyerSection;
     }
 
     public Ad() {
@@ -44,14 +47,6 @@ public class Ad implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 
     public String getUrl() {
@@ -78,26 +73,43 @@ public class Ad implements Serializable {
         this.price = price;
     }
 
-    public FlyerSection getFlyerSection() {
-        return flyerSection;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setFlyerSection(FlyerSection flyerSection) {
-        this.flyerSection = flyerSection;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
-    public void addProduct(Product product) {
-        product.addAd(this);
-        this.product = product;
+    public ProductCategory getProductCategory() {
+        return productCategory;
     }
 
-    public void removeProduct() {
-        this.product.removeAd(this);
-        this.product = null;
+    public void setProductCategory(ProductCategory productCategory) {
+        this.productCategory = productCategory;
     }
 
-    public void removeFlyerSection() {
-        this.flyerSection.removeAd(this);
-        this.flyerSection = null;
+    public List<Market> getMarkets() {
+        return markets;
+    }
+
+    public void setMarkets(List<Market> markets) {
+        this.markets = markets;
+    }
+
+    public Date getInitialDate() {
+        return initialDate;
+    }
+
+    public void setInitialDate(Date initialDate) {
+        this.initialDate = initialDate;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }

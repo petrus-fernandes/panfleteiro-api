@@ -36,4 +36,13 @@ public enum ProductCategory {
         }
         throw new IllegalArgumentException("Invalid code for ProductCategory: " + code);
     }
+
+    public static ProductCategory fromName(String name) {
+        for (ProductCategory category : ProductCategory.values()) {
+            if (category.name.equals(name)) {
+                return category;
+            }
+        }
+        throw new IllegalArgumentException("Invalid name for ProductCategory: " + name);
+    }
 }

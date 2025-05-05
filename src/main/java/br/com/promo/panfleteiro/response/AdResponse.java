@@ -11,25 +11,17 @@ public class AdResponse {
     
     private Long id;
 
-    private Long flyerSectionId;
-
-    private Long productId;
-
     private String productName;
+
+    private String productCategory;
 
     private BigDecimal price;
 
     private Double distance;
 
-    private Double latitude;
-
-    private Double longitude;
-
     private Boolean active;
 
-    private String marketName;
-
-    private String marketAddress;
+    private MarketResponse market;
 
     private String url;
 
@@ -39,7 +31,6 @@ public class AdResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date expirationDate;
 
-    private List<Long> marketsId = new ArrayList<>();
 
 
     public Long getId() {
@@ -48,14 +39,6 @@ public class AdResponse {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public List<Long> getMarketsId() {
-        return marketsId;
-    }
-
-    public void setMarketsId(List<Long> marketsId) {
-        this.marketsId = marketsId;
     }
 
     public BigDecimal getPrice() {
@@ -74,7 +57,6 @@ public class AdResponse {
         this.distance = distance;
     }
 
-
     public Boolean getActive() {
         return active;
     }
@@ -91,14 +73,6 @@ public class AdResponse {
         this.url = url;
     }
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
     public String getProductName() {
         return productName;
     }
@@ -107,12 +81,12 @@ public class AdResponse {
         this.productName = productName;
     }
 
-    public Long getFlyerSectionId() {
-        return flyerSectionId;
+    public String getProductCategory() {
+        return productCategory;
     }
 
-    public void setFlyerSectionId(Long flyerSectionId) {
-        this.flyerSectionId = flyerSectionId;
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
     }
 
     public Date getInitialDate() {
@@ -131,35 +105,11 @@ public class AdResponse {
         this.expirationDate = expirationDate;
     }
 
-    public Double getLatitude() {
-        return latitude;
+    public MarketResponse getMarket() {
+        return market;
     }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getMarketName() {
-        return marketName;
-    }
-
-    public void setMarketName(String marketName) {
-        this.marketName = marketName;
-    }
-
-    public String getMarketAddress() {
-        return marketAddress;
-    }
-
-    public void setMarketAddress(String marketAddress) {
-        this.marketAddress = marketAddress;
+    public void setMarket(MarketResponse market) {
+        this.market = market;
     }
 }

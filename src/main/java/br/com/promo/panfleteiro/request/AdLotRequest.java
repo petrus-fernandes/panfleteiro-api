@@ -1,19 +1,12 @@
 package br.com.promo.panfleteiro.request;
 
-import br.com.promo.panfleteiro.entity.ProductCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class AdRequest {
+public class AdLotRequest {
 
-    private String productName;
-    private String productCategory;
-    private BigDecimal price;
-    private Boolean active;
     private String url;
     private List<Long> marketsId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
@@ -22,21 +15,7 @@ public class AdRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date expirationDate;
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
+    private List<AdRequest> ads;
 
     public String getUrl() {
         return url;
@@ -44,22 +23,6 @@ public class AdRequest {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public String getProductCategory() {
-        return productCategory;
-    }
-
-    public void setProductCategory(String productCategory) {
-        this.productCategory = productCategory;
     }
 
     public List<Long> getMarketsId() {
@@ -85,5 +48,12 @@ public class AdRequest {
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
     }
-}
 
+    public List<AdRequest> getAds() {
+        return ads;
+    }
+
+    public void setAds(List<AdRequest> ads) {
+        this.ads = ads;
+    }
+}

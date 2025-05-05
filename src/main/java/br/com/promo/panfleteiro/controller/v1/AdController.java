@@ -4,11 +4,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import br.com.promo.panfleteiro.orchestrator.FlyerOrchestrator;
+import br.com.promo.panfleteiro.helper.AdMarketHelper;
+import br.com.promo.panfleteiro.request.AdLotRequest;
 import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
@@ -26,48 +28,52 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @RequestMapping(path = "v1/anuncios", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class AdController {
+    @Autowired
+    private AdService adService;
 
-    private final AdService adService;
-
-    private final FlyerOrchestrator flyerOrchestrator;
+    @Autowired
+    private AdMarketHelper adMarketHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(AdController.class);
 
-    public AdController(AdService adService, FlyerOrchestrator flyerOrchestrator) {
-        this.adService = adService;
-        this.flyerOrchestrator = flyerOrchestrator;
+    @PostMapping
+    public ResponseEntity<List<AdResponse>> create(@Valid @RequestBody AdRequest adRequest) {
+        logger.info("Creating AdRequest: {}", adRequest);
+        List<AdResponse> adsResponse = adMarketHelper.createAd(adRequest);
+        logger.info("Created Ad successfully");
+        return ResponseEntity.status(201).body(adsResponse);
     }
 
-    @PostMapping
-    public ResponseEntity<AdResponse> create(@Valid @RequestBody AdRequest adRequest) {
-        logger.info("Creating AdRequest: {}", adRequest);
-        AdResponse adResponse = adService.convertToAdResponse(flyerOrchestrator.createAd(adRequest));
-        logger.info("Created AdResponse: {}", adResponse.getId());
-        return ResponseEntity.status(201).body(adResponse);
+    @PostMapping("/lot")
+    public ResponseEntity<List<AdResponse>> createLot(@Valid @RequestBody AdLotRequest adLotRequest) {
+        logger.info("Creating AdRequest: {}", adLotRequest);
+        List<AdResponse> adsResponse = adMarketHelper.createAdLot(adLotRequest);
+        logger.info("Created Ad successfully");
+        return ResponseEntity.status(201).body(adsResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AdResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<List<AdResponse>> findById(@PathVariable Long id) {
         logger.info("Looking for AdResponse with ID: {}", id);
-        return ResponseEntity.ok(adService.convertToAdResponse(adService.findById(id)));
+        return ResponseEntity.ok(adMarketHelper.convertToAdsResponse(adService.findById(id)));
     }
 
     @GetMapping
     public ResponseEntity<List<AdResponse>> list() {
         logger.info("Listing all AdResponses");
-        return ResponseEntity.ok(adService.list());
+        return ResponseEntity.ok(adMarketHelper.listAdsResponseWithMarket());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AdResponse> update(@PathVariable Long id, @RequestBody AdRequest adRequest) {
+    public ResponseEntity<List<AdResponse>> update(@PathVariable Long id, @RequestBody AdRequest adRequest) {
         logger.info("Updating AdRequest with ID: {}", id);
-        return ResponseEntity.ok(adService.convertToAdResponse(flyerOrchestrator.updateAd(id, adRequest)));
+        return ResponseEntity.ok(adMarketHelper.updateAd(id, adRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         logger.info("Deleting AdResponse with ID: {}", id);
-        flyerOrchestrator.deleteAd(id);
+        adMarketHelper.deleteAd(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -129,13 +135,12 @@ public class AdController {
     @GetMapping("/desativarAnunciosExpirados")
     public ResponseEntity<Void> desativarAnunciosExpirados() {
         logger.info("Desativar Anuncios Expirados");
-        flyerOrchestrator.deactivateEntitiesByExpiratedDate();
+        adMarketHelper.deactivateEntitiesByExpiratedDate();
         return ResponseEntity.noContent().build();
     }
 
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
-        return adsPage.stream().filter(ad -> ad.getFlyerSection() != null && ad.getFlyerSection().getMarkets() != null)
-                .flatMap(ad -> adService.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
+        return adsPage.stream().flatMap(ad -> adMarketHelper.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
                 .sorted(Comparator.comparing(AdResponse::getActive)
                         .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                                 .thenComparing(AdResponse::getDistance)

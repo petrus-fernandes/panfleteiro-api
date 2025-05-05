@@ -13,12 +13,11 @@ import java.util.List;
 public interface AdRepository extends JpaRepository<Ad, Long> {
 
 
-    @Query("SELECT a FROM Ad a WHERE UPPER(a.product.name) LIKE UPPER(CONCAT('%', :productName, '%'))")
+    @Query("SELECT a FROM Ad a WHERE UPPER(a.productName) LIKE UPPER(CONCAT('%', :productName, '%'))")
     Page<Ad> findAdsByProductName(@Param("productName") String productName, Pageable pageable);
 
     @Query("SELECT a FROM Ad a " +
-            "JOIN a.flyerSection s " +
-            "JOIN s.markets m " +
+            "JOIN a.markets m " +
             "JOIN m.location l " +
             "WHERE l.latitude BETWEEN :minLat AND :maxLat " +
             "AND l.longitude BETWEEN :minLon AND :maxLon " +
@@ -38,10 +37,9 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
                                               Pageable pageable);
 
     @Query("SELECT a FROM Ad a " +
-            "JOIN a.flyerSection s " +
-            "JOIN s.markets m " +
+            "JOIN a.markets m " +
             "JOIN m.location l " +
-            "WHERE l.latitude BETWEEN :minLat AND :maxLat AND UPPER(a.product.name) LIKE UPPER(CONCAT('%', :productName, '%'))" +
+            "WHERE l.latitude BETWEEN :minLat AND :maxLat AND UPPER(a.productName) LIKE UPPER(CONCAT('%', :productName, '%'))" +
             "AND l.longitude BETWEEN :minLon AND :maxLon " +
             "AND (6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
             "* cos(radians(l.longitude) - radians(:baseLon)) " +
