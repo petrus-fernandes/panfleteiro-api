@@ -123,7 +123,7 @@ public class AdMarketHelper {
 
     public List<AdResponse> createAdLot(AdLotRequest adLotRequest) {
         return adLotRequest.getAds().stream().flatMap(adRequest -> {
-            if (adRequest.getMarketsId().isEmpty()) {
+            if (adRequest.getMarketsId() == null || adRequest.getMarketsId().isEmpty()) {
                 adRequest.setMarketsId(adLotRequest.getMarketsId());
             }
 
@@ -134,7 +134,7 @@ public class AdMarketHelper {
             if (adRequest.getExpirationDate() == null) {
                 adRequest.setExpirationDate(adLotRequest.getExpirationDate());
             }
-            if (adRequest.getUrl().isEmpty()) {
+            if (adRequest.getUrl() == null || adRequest.getUrl().isEmpty()) {
                 adRequest.setUrl(adLotRequest.getUrl());
             }
             Ad ad = this.createAdWithMarket(adRequest);

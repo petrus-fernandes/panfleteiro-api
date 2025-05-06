@@ -2,14 +2,18 @@ package br.com.promo.panfleteiro.entity;
 
 public enum ProductCategory {
     BUTCHER(1, "Açougue"),
-    COLD_CUTS_AND_DAIRY(2, "Frios e Laticínios"),
-    CELLAR_AND_DRINKS(3, "Adega e Bebidas"),
-    HYGIENE_AND_CLEANING(4, "Higiene e Limpeza"),
-    VEGETABLES_AND_GROCERY(5, "Hortifruti e Mercearia"),
-    BAKERY(6, "Padaria"),
-    CANNED_GOODS(7, "Enlatados"),
-    GRAINS(8, "Cereais"),
-    ROTISSERIE(9, "Rotisseria");
+    COLD_CUTS(2, "Frios"),
+    DAIRY(3, "Laticínios"),
+    CELLAR(4, "Adega"),
+    DRINKS(5, "Bebidas"),
+    HYGIENE(6, "Higiene"),
+    CLEANING(7, "Limpeza"),
+    VEGETABLES(8, "Hortifruti"),
+    GROCERY(9, "Mercearia"),
+    BAKERY(10, "Padaria"),
+    CANNED_GOODS(11, "Enlatados"),
+    GRAINS(12, "Cereais"),
+    ROTISSERIE(13, "Rotisseria");
 
     final private Integer code;
 
