@@ -13,7 +13,8 @@ public enum ProductCategory {
     BAKERY(10, "Padaria"),
     CANNED_GOODS(11, "Enlatados"),
     GRAINS(12, "Cereais"),
-    ROTISSERIE(13, "Rotisseria");
+    ROTISSERIE(13, "Rotisseria"),
+    PETSHOP(14, "Petshop");
 
     final private Integer code;
 
