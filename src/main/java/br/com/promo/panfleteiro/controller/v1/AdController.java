@@ -80,7 +80,7 @@ public class AdController {
     @GetMapping(value = "/buscaPorNome", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
     public ResponseEntity<Page<AdResponse>> searchAdsByProductName(@RequestParam String productName, @RequestParam int page, @RequestParam int size) {
         logger.info("Searching for ads by product name: {}", productName);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("active", "product.name").ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("active", "productName").ascending());
         Page<Ad> adsPage = adService.findAdsByProductName(productName, pageable);
         Page<AdResponse> adsResponsePage = adsPage.map(adService::convertToAdResponse);
         return ResponseEntity.ok(adsResponsePage);
