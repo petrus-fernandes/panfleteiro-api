@@ -80,9 +80,12 @@ public class AdController {
     @GetMapping(value = "/buscaPorNome", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
     public ResponseEntity<Page<AdResponse>> searchAdsByProductName(@RequestParam String productName, @RequestParam int page, @RequestParam int size) {
         logger.info("Searching for ads by product name: {}", productName);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("active", "productName").ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("active").descending());
         Page<Ad> adsPage = adService.findAdsByProductName(productName, pageable);
-        Page<AdResponse> adsResponsePage = adsPage.map(adService::convertToAdResponse);
+        List<AdResponse> adsResponseList = getAdsResponseListSorted(adsPage);
+        Page<AdResponse> adsResponsePage = new PageImpl<>(manualPageableAdResponse(page, size, adsResponseList), pageable, adsResponseList.size());
+
+        logger.info("Found {} ads by distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }
 
@@ -95,7 +98,7 @@ public class AdController {
             @RequestParam Integer size) {
         logger.info("Searching for ads by distance: {} km using latitude: {} and longitude: {}", rangeInKm, latitude, longitude);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("active").descending());
         Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude, rangeInKm, pageable);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
         Page<AdResponse> adsResponsePage = new PageImpl<>(manualPageableAdResponse(page, size, adsResponseList), pageable, adsResponseList.size());
@@ -116,10 +119,10 @@ public class AdController {
         logger.info("Searching for ads by product name: {} and distance: {} km using latitude: {} and longitude: {}",
                 productName, rangeInKm, latitude, longitude);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("active").ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("active").descending());
         Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
-        Page<AdResponse> adsResponsePage = new PageImpl<>(manualPageableAdResponse(page, size, adsResponseList), pageable, adsResponseList.size());
+        Page<AdResponse> adsResponsePage = new PageImpl<>(adsResponseList, pageable, adsResponseList.size());
 
         logger.info("Found {} ads by product name and distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
@@ -141,9 +144,17 @@ public class AdController {
 
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         return adsPage.stream().flatMap(ad -> adMarketHelper.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
-                .sorted(Comparator.comparing(AdResponse::getActive)
+                .sorted(Comparator.comparing(AdResponse::getActive).reversed()
                         .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                                 .thenComparing(AdResponse::getDistance)
+                                .thenComparing(AdResponse::getProductName)
+                        )).collect(Collectors.toList());
+    }
+
+    private List<AdResponse> getAdsResponseListSorted(Page<Ad> adsPage) {
+        return adsPage.stream().map(adMarketHelper::convertToAdsResponse).flatMap(List::stream)
+                .sorted(Comparator.comparing(AdResponse::getActive).reversed()
+                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                                 .thenComparing(AdResponse::getProductName)
                         )).collect(Collectors.toList());
     }
