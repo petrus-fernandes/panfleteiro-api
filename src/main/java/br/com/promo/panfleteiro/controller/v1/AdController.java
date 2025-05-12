@@ -145,9 +145,9 @@ public class AdController {
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         return adsPage.stream().flatMap(ad -> adMarketHelper.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
                 .sorted(Comparator.comparing(AdResponse::getActive).reversed()
+                        .thenComparing(AdResponse::getDistance)
+                        .thenComparing(AdResponse::getProductName)
                         .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
-                                .thenComparing(AdResponse::getDistance)
-                                .thenComparing(AdResponse::getProductName)
                         )).collect(Collectors.toList());
     }
 
