@@ -119,7 +119,7 @@ public class AdController {
         logger.info("Searching for ads by product name: {} and distance: {} km using latitude: {} and longitude: {}",
                 productName, rangeInKm, latitude, longitude);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("active").descending());
+        Pageable pageable = PageRequest.of(page, size);
         Page<Ad> adsPage = adService.findAdsByProductNameAndDistance(latitude, longitude, rangeInKm, pageable, productName);
         List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
         Page<AdResponse> adsResponsePage = new PageImpl<>(adsResponseList, pageable, adsResponseList.size());
@@ -146,8 +146,8 @@ public class AdController {
         return adsPage.stream().flatMap(ad -> adMarketHelper.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
                 .sorted(Comparator.comparing(AdResponse::getActive).reversed()
                         .thenComparing(AdResponse::getDistance)
+                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate)
                         .thenComparing(AdResponse::getProductName)
-                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                         )).collect(Collectors.toList());
     }
 

@@ -80,12 +80,10 @@ public class AdService {
     public Page<Ad> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
         Map<String, Double> boundingBox = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
 
-        Page<Ad> adsWithDistance = adRepository.findAdsByProductNameAndDistanceWithBoundingBox(
+        return adRepository.findAdsByProductNameAndDistanceWithBoundingBox(
                 boundingBox.get("minLat"), boundingBox.get("maxLat"),
                 boundingBox.get("minLon"), boundingBox.get("maxLon"),
                 latitude, longitude, rangeInKm, productName, pageable);
-
-        return adsWithDistance;
     }
 
     public List<Ad> getActiveAds() {

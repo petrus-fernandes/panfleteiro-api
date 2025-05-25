@@ -44,7 +44,8 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
             "AND (6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
             "* cos(radians(l.longitude) - radians(:baseLon)) " +
             "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) <= :rangeInKm " +
-            "ORDER BY (6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
+            "ORDER BY a.active DESC, " +
+            "(6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
             "* cos(radians(l.longitude) - radians(:baseLon)) " +
             "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) ASC")
     Page<Ad> findAdsByProductNameAndDistanceWithBoundingBox(@Param("minLat") double minLat,
