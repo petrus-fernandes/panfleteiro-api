@@ -146,16 +146,16 @@ public class AdController {
         return adsPage.stream().flatMap(ad -> adMarketHelper.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
                 .sorted(Comparator.comparing(AdResponse::getActive).reversed()
                         .thenComparing(AdResponse::getDistance)
-                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate)
                         .thenComparing(AdResponse::getProductName)
+                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                         )).collect(Collectors.toList());
     }
 
     private List<AdResponse> getAdsResponseListSorted(Page<Ad> adsPage) {
         return adsPage.stream().map(adMarketHelper::convertToAdsResponse).flatMap(List::stream)
                 .sorted(Comparator.comparing(AdResponse::getActive).reversed()
+                        .thenComparing(AdResponse::getProductName)
                         .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
-                                .thenComparing(AdResponse::getProductName)
                         )).collect(Collectors.toList());
     }
 }
