@@ -16,8 +16,8 @@ public class DeactivateAllProprietiesWithExpiratedDateJob implements Job {
     private static final Logger logger = LoggerFactory.getLogger(DeactivateAllProprietiesWithExpiratedDateJob.class);
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        logger.info("Initiate deactivation of Ads, FlyerSections and Flyers expirated.");
+        logger.info("Initiate deactivation of expirated Ads expirated.");
         adMarketHelper.deactivateEntitiesByExpiratedDate();
-        logger.info("Deactivation of Ads, FlyerSections and Flyers expirated completed.");
+        logger.info("Deactivation of Ads completed.");
     }
 }

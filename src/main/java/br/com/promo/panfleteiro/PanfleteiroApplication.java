@@ -28,7 +28,7 @@ public class PanfleteiroApplication {
 		return TriggerBuilder.newTrigger()
 				.forJob(validateExpirationDateDetail())
 				.withIdentity("adTrigger", "system")
-				.withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(21, 0))
+				.withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(3, 0))
 				.build();
 	}
 
