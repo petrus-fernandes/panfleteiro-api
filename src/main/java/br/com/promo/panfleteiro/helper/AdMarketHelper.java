@@ -124,22 +124,49 @@ public class AdMarketHelper {
     public List<AdResponse> createAdLot(AdLotRequest adLotRequest) {
         return adLotRequest.getAds().stream().flatMap(adRequest -> {
             if (adRequest.getMarketsId() == null || adRequest.getMarketsId().isEmpty()) {
-                adRequest.setMarketsId(adLotRequest.getMarketsId());
+                adRequest.setMarketsId(getMarketsId(adLotRequest));
             }
 
-            if (adRequest.getInitialDate() == null) {
+            if (adRequest.getInitialDate() == null && adLotRequest.getInitialDate() != null) {
                 adRequest.setInitialDate(adLotRequest.getInitialDate());
             }
 
-            if (adRequest.getExpirationDate() == null) {
+            if (adRequest.getExpirationDate() == null && adLotRequest.getExpirationDate() != null) {
                 adRequest.setExpirationDate(adLotRequest.getExpirationDate());
             }
+
             if (adRequest.getUrl() == null || adRequest.getUrl().isEmpty()) {
-                adRequest.setUrl(adLotRequest.getUrl());
+                adRequest.setUrl(getUrl(adLotRequest));
             }
+
             Ad ad = this.createAdWithMarket(adRequest);
             return convertToAdsResponse(ad).stream();
         }).collect(Collectors.toList());
+    }
+
+    private static String getUrl(AdLotRequest adLotRequest) {
+        if (adLotRequest.getUrl() != null || !adLotRequest.getUrl().isEmpty()) {
+            return adLotRequest.getUrl();
+        } else {
+            throw new RuntimeException("Url not informed, please inform url.");
+        }
+    }
+
+    private List<Long> getMarketsId(AdLotRequest adLotRequest) {
+        if (adLotRequest.getMarketsId() != null && !adLotRequest.getMarketsId().isEmpty()) {
+            return adLotRequest.getMarketsId();
+
+        } else if (adLotRequest.getMarketExternalCode() != null && !adLotRequest.getMarketExternalCode().isEmpty()) {
+            return getMarketsIdByExternalCode(adLotRequest.getMarketExternalCode());
+
+        } else {
+            throw new RuntimeException("Market not informed, please inform marketsId or marketExternalCode.");
+        }
+    }
+
+    private List<Long> getMarketsIdByExternalCode(String marketExternalCode) {
+        Market market = marketService.findByExternalCode(marketExternalCode);
+        return market.getMarketChain().stream().map(Market::getId).collect(Collectors.toList());
     }
 
     public MarketResponse getMarketResponseById(Long id) {

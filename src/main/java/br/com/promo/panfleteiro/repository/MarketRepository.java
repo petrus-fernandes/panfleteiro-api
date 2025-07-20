@@ -9,4 +9,8 @@ import java.util.List;
 public interface MarketRepository extends JpaRepository<Market, Long> {
 
     List<Market> findByNameContainingIgnoreCase(String name);
+
+    Market findByExternalCode(String marketExternalCode);
+
+    boolean existsByExternalCode(String externalCode);
 }

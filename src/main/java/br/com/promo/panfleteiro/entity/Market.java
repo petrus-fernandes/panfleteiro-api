@@ -22,6 +22,14 @@ public class Market implements Serializable {
     @ManyToMany(mappedBy = "markets")
     private List<Ad> ads;
 
+    @Column(unique = true)
+    private String externalCode;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Market> marketChain;
+
+    private boolean headQuarters;
+
     public Market(String name, Location location) {
         this.name = name;
         this.location = location;
@@ -68,5 +76,29 @@ public class Market implements Serializable {
 
     public void removeAd(Ad ad) {
         this.ads.remove(ad);
+    }
+
+    public String getExternalCode() {
+        return externalCode;
+    }
+
+    public void setExternalCode(String externalCode) {
+        this.externalCode = externalCode;
+    }
+
+    public List<Market> getMarketChain() {
+        return marketChain;
+    }
+
+    public void setMarketChain(List<Market> marketChain) {
+        this.marketChain = marketChain;
+    }
+
+    public boolean isHeadQuarters() {
+        return headQuarters;
+    }
+
+    public void setHeadQuarters(boolean headQuarters) {
+        this.headQuarters = headQuarters;
     }
 }

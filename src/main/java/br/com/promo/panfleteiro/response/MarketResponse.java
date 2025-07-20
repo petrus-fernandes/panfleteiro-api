@@ -14,10 +14,19 @@ public class MarketResponse {
 
     private List<AdResponse> ads = new ArrayList<>();
 
-    public MarketResponse(Long id, String name, LocationResponse location) {
+    private String externalCode;
+
+    private List<Long> marketsId;
+
+    private boolean headQuarters;
+
+    public MarketResponse(Long id, String name, LocationResponse location, String externalCode, List<Long> marketsId, boolean headQuarters) {
         this.id = id;
         this.name = name;
         this.location = location;
+        this.externalCode = externalCode;
+        this.marketsId = marketsId;
+        this.headQuarters = headQuarters;
     }
 
     public Long getId() {
@@ -52,4 +61,27 @@ public class MarketResponse {
         this.ads = ads;
     }
 
+    public String getExternalCode() {
+        return externalCode;
+    }
+
+    public void setExternalCode(String externalCode) {
+        this.externalCode = externalCode;
+    }
+
+    public List<Long> getMarketsId() {
+        return marketsId;
+    }
+
+    public void setMarketsId(List<Long> marketsId) {
+        this.marketsId = marketsId;
+    }
+
+    public boolean isHeadQuarters() {
+        return headQuarters;
+    }
+
+    public void setHeadQuarters(boolean headQuarters) {
+        this.headQuarters = headQuarters;
+    }
 }

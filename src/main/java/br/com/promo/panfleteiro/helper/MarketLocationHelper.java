@@ -38,7 +38,10 @@ public class MarketLocationHelper {
         return new MarketResponse(
                 market.getId(),
                 market.getName(),
-                market.getLocation() != null ? convertLocationToResponse(market.getLocation()) : null
+                market.getLocation() != null ? convertLocationToResponse(market.getLocation()) : null,
+                market.getExternalCode(),
+                market.getMarketChain() != null ? market.getMarketChain().stream().map(Market::getId).toList() : null,
+                market.isHeadQuarters()
         );
     }
 

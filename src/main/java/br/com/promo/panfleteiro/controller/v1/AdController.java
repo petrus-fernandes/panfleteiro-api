@@ -135,7 +135,7 @@ public class AdController {
         return adsResponseList.subList(start, end);
     }
 
-    @GetMapping("/desativarAnunciosExpirados")
+    @PostMapping("/desativarAnunciosExpirados")
     public ResponseEntity<Void> desativarAnunciosExpirados() {
         logger.info("Desativar Anuncios Expirados");
         adMarketHelper.deactivateEntitiesByExpiratedDate();

@@ -25,11 +25,29 @@ public class MarketService {
     }
 
     public MarketResponse create(MarketRequest marketRequest) {
+        validateExternalCode(marketRequest.getExternalCode());
+
         Optional<Location> location = marketLocationHelper.findLocationWithAddress(marketRequest.getAddress());
         Location persistedLocation = location.orElseGet(() -> (marketLocationHelper.createLocationWithAddress(marketRequest.getAddress())));
         persistedLocation.setActive(true);
-        Market market = marketRepository.save(new Market(marketRequest.getName(),persistedLocation));
-        return marketLocationHelper.convertMarketToResponse(market);
+
+        Market market = new Market(marketRequest.getName(),persistedLocation);
+        market.setExternalCode(marketRequest.getExternalCode());
+        market.setHeadQuarters(marketRequest.isHeadQuarters());
+
+        if (marketRequest.isHeadQuarters() && marketRequest.getMarketsId() != null && !marketRequest.getMarketsId().isEmpty()) {
+            market.setMarketChain(marketRepository.findAllById(marketRequest.getMarketsId()));
+        }
+
+        return marketLocationHelper.convertMarketToResponse(marketRepository.save(market));
+    }
+
+    private void validateExternalCode(String externalCode) {
+        if (externalCode == null || externalCode.isEmpty()) return;
+
+        if (marketRepository.existsByExternalCode(externalCode)) {
+            throw new IllegalArgumentException("Market with external code " + externalCode + " already exists.");
+        }
     }
 
     public List<MarketResponse> findAll() {
@@ -43,6 +61,7 @@ public class MarketService {
     }
 
     public MarketResponse update(Long id, MarketRequest marketRequest) {
+        validateExternalCode(marketRequest.getExternalCode());
         Market market = marketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Market not found with ID: " + id));
         Optional<Location> locationOptional = marketLocationHelper.findLocationWithAddress(marketRequest.getAddress());
@@ -50,6 +69,11 @@ public class MarketService {
 
         market.setName(marketRequest.getName());
         market.setLocation(location);
+        market.setExternalCode(marketRequest.getExternalCode());
+
+        if (marketRequest.isHeadQuarters() && marketRequest.getMarketsId() != null && !marketRequest.getMarketsId().isEmpty()) {
+            market.setMarketChain(marketRepository.findAllById(marketRequest.getMarketsId()));
+        }
 
         return marketLocationHelper.convertMarketToResponse(marketRepository.save(market));
     }
@@ -61,5 +85,9 @@ public class MarketService {
 
     public List<MarketResponse> findByName(String name) {
         return marketRepository.findByNameContainingIgnoreCase(name).stream().map(marketLocationHelper::convertMarketToResponse).toList();
+    }
+
+    public Market findByExternalCode(String marketExternalCode) {
+        return marketRepository.findByExternalCode(marketExternalCode);
     }
 }

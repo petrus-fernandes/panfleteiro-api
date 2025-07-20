@@ -9,6 +9,8 @@ public class AdLotRequest {
 
     private String url;
     private List<Long> marketsId;
+
+    private String marketExternalCode;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date initialDate;
 
@@ -31,6 +33,14 @@ public class AdLotRequest {
 
     public void setMarketsId(List<Long> marketsId) {
         this.marketsId = marketsId;
+    }
+
+    public String getMarketExternalCode() {
+        return marketExternalCode;
+    }
+
+    public void setMarketExternalCode(String marketExternalCode) {
+        this.marketExternalCode = marketExternalCode;
     }
 
     public Date getInitialDate() {
