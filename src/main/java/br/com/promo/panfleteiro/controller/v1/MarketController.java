@@ -6,6 +6,7 @@ import br.com.promo.panfleteiro.helper.AdMarketHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import br.com.promo.panfleteiro.response.MarketResponse;
 import br.com.promo.panfleteiro.service.MarketService;
 
 @RestController
-@RequestMapping("/v1/mercados")
+@RequestMapping(path = "v1/mercados", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 public class MarketController {
 
     private static final Logger logger = LoggerFactory.getLogger(LocationController.class);

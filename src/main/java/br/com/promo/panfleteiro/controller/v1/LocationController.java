@@ -6,13 +6,14 @@ import br.com.promo.panfleteiro.request.LocationRequest;
 import br.com.promo.panfleteiro.response.LocationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.promo.panfleteiro.service.LocationService;
 
 @RestController
-@RequestMapping("/v1/locais")
+@RequestMapping(path = "v1/locais", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 public class LocationController {
 
     LocationService locationService;
