@@ -1,4 +1,4 @@
-package br.com.promo.panfleteiro.service;
+package br.com.promo.panfleteiro.integration.service;
 
 import java.io.IOException;
 

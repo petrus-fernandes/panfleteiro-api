@@ -34,3 +34,7 @@ build/
 
 ### Aplication Properties ###
 src/main/resources/application.properties
+src/test/resources/imagem_panfleto_teste.png
+
+### Secrets ###
+src/main/resources/drive-service-account.json

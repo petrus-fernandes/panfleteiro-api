@@ -5,7 +5,7 @@ import br.com.promo.panfleteiro.entity.Market;
 import br.com.promo.panfleteiro.repository.LocationRepository;
 import br.com.promo.panfleteiro.response.LocationResponse;
 import br.com.promo.panfleteiro.response.MarketResponse;
-import br.com.promo.panfleteiro.service.GeocodingApiService;
+import br.com.promo.panfleteiro.integration.service.GeocodingApiService;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

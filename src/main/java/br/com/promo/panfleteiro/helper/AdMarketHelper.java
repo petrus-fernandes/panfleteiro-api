@@ -9,6 +9,7 @@ import br.com.promo.panfleteiro.response.AdResponse;
 import br.com.promo.panfleteiro.response.MarketResponse;
 import br.com.promo.panfleteiro.service.AdService;
 import br.com.promo.panfleteiro.service.MarketService;
+import br.com.promo.panfleteiro.util.ProductNameNormalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,9 +141,14 @@ public class AdMarketHelper {
                 adRequest.setUrl(getUrl(adLotRequest));
             }
 
+            normalizeProductName(adRequest);
             Ad ad = this.createAdWithMarket(adRequest);
             return convertToAdsResponse(ad).stream();
         }).collect(Collectors.toList());
+    }
+
+    private static void normalizeProductName(AdRequest adRequest) {
+        adRequest.setProductName(ProductNameNormalizer.normalize(adRequest.getProductName()));
     }
 
     private static String getUrl(AdLotRequest adLotRequest) {
