@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -102,8 +103,8 @@ public class AdMarketHelper {
             });
     }
 
-    private boolean isExpirated(Date expirationDate) {
-        return expirationDate != null && expirationDate.before(new Date());
+    private boolean isExpirated(LocalDate expirationDate) {
+        return expirationDate != null && expirationDate.isBefore(new Date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
     }
 
     public AdResponse convertToAdResponseWithUniqueMarketAndDistance(Ad ad, Market market, Double distance) {
@@ -166,6 +167,9 @@ public class AdMarketHelper {
 
     private List<Long> getMarketsIdByExternalCode(String marketExternalCode) {
         Market market = marketService.findByExternalCode(marketExternalCode);
+        if (market == null) {
+            throw new RuntimeException("Market not found by external code: " + marketExternalCode);
+        }
         return market.getMarketChain().stream().map(Market::getId).collect(Collectors.toList());
     }
 

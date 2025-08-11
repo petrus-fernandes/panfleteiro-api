@@ -2,6 +2,7 @@ package br.com.promo.panfleteiro.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -28,9 +29,9 @@ public class Ad implements Serializable {
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Market> markets;
 
-    private Date initialDate;
+    private LocalDate initialDate;
 
-    private Date expirationDate;
+    private LocalDate expirationDate;
 
     public Ad(String url, Boolean active, BigDecimal price) {
         this.url = url;
@@ -97,19 +98,19 @@ public class Ad implements Serializable {
         this.markets = markets;
     }
 
-    public Date getInitialDate() {
+    public LocalDate getInitialDate() {
         return initialDate;
     }
 
-    public void setInitialDate(Date initialDate) {
+    public void setInitialDate(LocalDate initialDate) {
         this.initialDate = initialDate;
     }
 
-    public Date getExpirationDate() {
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Date expirationDate) {
+    public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
     }
 }

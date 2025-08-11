@@ -3,6 +3,7 @@ package br.com.promo.panfleteiro.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,10 +27,10 @@ public class AdResponse {
     private String url;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private Date initialDate;
+    private LocalDate initialDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private Date expirationDate;
+    private LocalDate expirationDate;
 
 
 
@@ -89,19 +90,19 @@ public class AdResponse {
         this.productCategory = productCategory;
     }
 
-    public Date getInitialDate() {
+    public LocalDate getInitialDate() {
         return initialDate;
     }
 
-    public void setInitialDate(Date initialDate) {
+    public void setInitialDate(LocalDate initialDate) {
         this.initialDate = initialDate;
     }
 
-    public Date getExpirationDate() {
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Date expirationDate) {
+    public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
     }
 
