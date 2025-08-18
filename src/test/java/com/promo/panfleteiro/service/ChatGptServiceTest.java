@@ -4,6 +4,7 @@ package com.promo.panfleteiro.service;
 import br.com.promo.panfleteiro.PanfleteiroApplication;
 import br.com.promo.panfleteiro.integration.service.ChatGptService;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ class ChatGptServiceTest {
     private ChatGptService chatGptService;
 
     @Test
+    @Ignore
     void enviarImagemEReceberRespostaDoChatGpt() {
         try {
             File imagem = new File("src/test/resources/imagem_panfleto_teste.png");

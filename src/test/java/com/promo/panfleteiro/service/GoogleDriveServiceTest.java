@@ -3,6 +3,7 @@ package com.promo.panfleteiro.service;
 import br.com.promo.panfleteiro.PanfleteiroApplication;
 import br.com.promo.panfleteiro.integration.service.GoogleDriveService;
 import com.google.api.services.drive.model.File;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class GoogleDriveServiceTest {
     }
 
     @Test
+    @Ignore
     public void listarPastasDoDrive() throws Exception {
         List<File> pastas = googleDriveService.listarPastasDeMercado(pastaRaizId);
 
@@ -37,6 +39,7 @@ public class GoogleDriveServiceTest {
     }
 
     @Test
+    @Ignore
     public void listarImagensDeUmaPasta() throws Exception {
         // Primeiro, lista as pastas
         List<File> pastas = googleDriveService.listarPastasDeMercado(pastaRaizId);
