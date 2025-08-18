@@ -19,11 +19,8 @@ public class GoogleDriveServiceTest {
     @Autowired
     private GoogleDriveService googleDriveService;
 
-    private final String pastaRaizId;
-
-    public GoogleDriveServiceTest(@Value("${google.drive.mercadao.main.directory.id}") String pastaRaizId) {
-        this.pastaRaizId = pastaRaizId;
-    }
+    @Value("${google.drive.mercadao.main.directory.id}")
+    private String pastaRaizId;
 
     @Test
     @Ignore
