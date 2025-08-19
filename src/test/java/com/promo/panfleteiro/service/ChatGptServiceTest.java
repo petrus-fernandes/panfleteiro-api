@@ -16,7 +16,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = ChatGptService.class)
+@SpringBootTest(classes = ChatGptService.class, properties = { "openai.api.key=112233456" })
 @EnableAutoConfiguration(exclude = {
         org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
         org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class
