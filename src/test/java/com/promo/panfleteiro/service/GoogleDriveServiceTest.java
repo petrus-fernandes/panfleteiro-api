@@ -4,6 +4,7 @@ import br.com.promo.panfleteiro.PanfleteiroApplication;
 import br.com.promo.panfleteiro.integration.service.GoogleDriveService;
 import com.google.api.services.drive.model.File;
 import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,15 @@ import static org.junit.jupiter.api.Assertions.*;
 })
 public class GoogleDriveServiceTest {
 
-    @Autowired
+    @Autowired(required = false)
     private GoogleDriveService googleDriveService;
+
+    @BeforeEach
+    void setup() {
+        if (googleDriveService == null) {
+            googleDriveService = new GoogleDriveService("PanflteiroTest");
+        }
+    }
 
     @Value("${google.drive.mercadao.main.directory.id}")
     private String pastaRaizId;
