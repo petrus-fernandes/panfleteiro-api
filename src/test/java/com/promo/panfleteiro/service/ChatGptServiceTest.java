@@ -3,8 +3,10 @@ package com.promo.panfleteiro.service;
 
 import br.com.promo.panfleteiro.PanfleteiroApplication;
 import br.com.promo.panfleteiro.integration.service.ChatGptService;
+import br.com.promo.panfleteiro.integration.service.GoogleDriveService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -21,8 +23,15 @@ import static org.junit.jupiter.api.Assertions.*;
 })
 class ChatGptServiceTest {
 
-    @Autowired
+    @Autowired(required = false)
     private ChatGptService chatGptService;
+
+    @BeforeEach
+    void setup() {
+        if (chatGptService == null) {
+            chatGptService = new ChatGptService("PanflteiroTest");
+        }
+    }
 
     @Test
     @Ignore
