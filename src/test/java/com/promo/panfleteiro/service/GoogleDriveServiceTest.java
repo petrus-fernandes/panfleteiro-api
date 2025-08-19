@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = GoogleDriveService.class)
+@SpringBootTest(classes = { GoogleDriveService.class }, properties = { "google.drive.application.name=PanflteiroTest" })
 @EnableAutoConfiguration(exclude = {
         org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
         org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class
