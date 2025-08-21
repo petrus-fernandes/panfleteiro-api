@@ -86,7 +86,7 @@ public class ImageProcessingScheduler {
     }
 
     private java.io.File baixarImagemDoDrive(Drive drive, String fileId, String nomeArquivoLocal) throws IOException {
-        java.io.File arquivoLocal = new java.io.File("/temp/" + nomeArquivoLocal);
+        java.io.File arquivoLocal = new java.io.File("/tmp/" + nomeArquivoLocal);
         try (FileOutputStream outputStream = new FileOutputStream(arquivoLocal)) {
             drive.files().get(fileId).executeMediaAndDownloadTo(outputStream);
         }
