@@ -1,7 +1,7 @@
 package br.com.promo.panfleteiro.controller.v1;
 
 import br.com.promo.panfleteiro.entity.FlyerValidation;
-import br.com.promo.panfleteiro.request.AdLotRequest;
+import br.com.promo.panfleteiro.infra.security.TokenService;
 import br.com.promo.panfleteiro.response.FlyerValidationResponse;
 import br.com.promo.panfleteiro.service.FlyerValidationService;
 import org.apache.coyote.BadRequestException;
@@ -20,8 +20,9 @@ public class ValidationController {
     private FlyerValidationService service;
 
     @GetMapping
-    public ResponseEntity<?> getNextValidation(@RequestParam String usuario) throws BadRequestException {
-        FlyerValidation flyerValidation = service.reserveForUser(usuario);
+    public ResponseEntity<?> getNextValidation() throws BadRequestException {
+        String user = TokenService.getCurrentUser();
+        FlyerValidation flyerValidation = service.reserveForUser(user);
         return flyerValidation != null ? ResponseEntity.ok(toFlyerValidationResponse(flyerValidation)) : ResponseEntity.noContent().build();
     }
 

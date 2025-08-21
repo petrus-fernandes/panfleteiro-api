@@ -1,6 +1,7 @@
 package br.com.promo.panfleteiro.controller.v1;
 
 import br.com.promo.panfleteiro.entity.User;
+import br.com.promo.panfleteiro.entity.UserRole;
 import br.com.promo.panfleteiro.infra.security.TokenService;
 import br.com.promo.panfleteiro.repository.UserRepository;
 import br.com.promo.panfleteiro.request.LoginRequest;
@@ -49,10 +50,10 @@ public class AuthenticationController {
 
     @PostMapping("/registrar")
     public ResponseEntity register(@RequestBody @Valid UserRequest userRequest) {
-        if (userRepository.findByLogin(userRequest.login()) != null) return ResponseEntity.badRequest().build();
+        if (userRepository.findByLogin(userRequest.login()) != null) return ResponseEntity.badRequest().body("Login já cadastrado");
         logger.info("Registering User: {}", userRequest.login());
         String encryptedPassword = new BCryptPasswordEncoder().encode(userRequest.password());
-        User user = new User(userRequest.login(), encryptedPassword, userRequest.role());
+        User user = new User(userRequest.login(), encryptedPassword, UserRole.valueOf(userRequest.role()));
         userRepository.save(user);
         logger.info("Registered User: {}", user.getId());
         return ResponseEntity.ok().build();
@@ -62,10 +63,10 @@ public class AuthenticationController {
     public ResponseEntity updateUser(@RequestBody @Valid UserRequest userRequest) {
         logger.info("Updating User: {}", userRequest.login());
         User user = userRepository.findUserByLogin(userRequest.login());
-        if (user == null) return ResponseEntity.badRequest().build();
+        if (user == null) return ResponseEntity.badRequest().body("Usuário não encontrado");
         String encryptedPassword = new BCryptPasswordEncoder().encode(userRequest.password());
         user.setPassword(encryptedPassword);
-        user.setRole(userRequest.role());
+        user.setRole(UserRole.valueOf(userRequest.role()));
         userRepository.save(user);
         logger.info("Updated User with ID: {}, Role: {}", user.getId(), user.getRole());
 
