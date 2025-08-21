@@ -100,7 +100,6 @@ public class ChatGptService {
         // Corpo final
         JsonNode root = mapper.createObjectNode()
                 .put("model", "gpt-5-mini")
-                .put("max_tokens", 2000)
                 .set("messages", mapper.createArrayNode().add(systemMessage).add(message));
 
 
