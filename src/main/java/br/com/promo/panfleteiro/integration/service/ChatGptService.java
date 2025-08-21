@@ -46,7 +46,8 @@ public class ChatGptService {
         O productCategory deve ser catalogado como:
         Açougue; Frios; Laticínios; Adega; Bebidas; Higiene; Limpeza; Hortifruti;
         Mercearia; Padaria; Enlatados; Cereais; Rotisseria; Petshop; Peixaria; Auto-peças;
-
+        O nome do produto dever possuir o nome completo como está no panfleto incluindo a grandeza de medida.
+        Os produtos alcoolicos devem ser catalogados com productCategory de Adega
         O price deve registrar o valor sem o desconto adicional de cartão da loja ou outro tipo de desconto enquanto o priceWithDiscount deve registrar o valor com o desconto adicional de cartão da loja ou outro tipo de desconto.
         Após criar o JSON, quero que revise o resultado alterando algumas informações conforme as seguintes regras:
         As datas devem estar no padrão dd/MM/YYYY.
@@ -98,7 +99,7 @@ public class ChatGptService {
 
         // Corpo final
         JsonNode root = mapper.createObjectNode()
-                .put("model", "gpt-4o-mini")
+                .put("model", "gpt-5-mini")
                 .put("max_tokens", 2000)
                 .set("messages", mapper.createArrayNode().add(systemMessage).add(message));
 
