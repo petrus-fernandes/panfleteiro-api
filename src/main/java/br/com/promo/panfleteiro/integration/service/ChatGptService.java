@@ -45,7 +45,7 @@ public class ChatGptService {
 
         O productCategory deve ser catalogado como:
         Açougue; Frios; Laticínios; Adega; Bebidas; Higiene; Limpeza; Hortifruti;
-        Mercearia; Padaria; Enlatados; Cereais; Rotisseria; Petshop; Peixaria; Auto-peças;
+        Mercearia; Padaria; Enlatados; Cereais; Rotisseria; Petshop; Peixaria; Auto-peças; Bazar; Congelados;
         O nome do produto dever possuir o nome completo como está no panfleto incluindo a grandeza de medida.
         Os produtos alcoolicos devem ser catalogados com productCategory de Adega
         O price deve registrar o valor sem o desconto adicional de cartão da loja ou outro tipo de desconto enquanto o priceWithDiscount deve registrar o valor com o desconto adicional de cartão da loja ou outro tipo de desconto.
