@@ -131,10 +131,14 @@ public class AdMarketHelper {
 
             if (adRequest.getInitialDate() == null && adLotRequest.getInitialDate() != null) {
                 adRequest.setInitialDate(adLotRequest.getInitialDate());
+            } else if (adRequest.getInitialDate() == null && adLotRequest.getInitialDate() == null) {
+                throw new RuntimeException("Data de inicio não informada para o anúncio: " + adRequest.getProductName());
             }
 
             if (adRequest.getExpirationDate() == null && adLotRequest.getExpirationDate() != null) {
                 adRequest.setExpirationDate(adLotRequest.getExpirationDate());
+            } else if (adRequest.getExpirationDate() == null && adLotRequest.getExpirationDate() == null) {
+                throw new RuntimeException("Data de expiração não informada para o anúncio: " + adRequest.getProductName());
             }
 
             if (adRequest.getUrl() == null || adRequest.getUrl().isEmpty()) {

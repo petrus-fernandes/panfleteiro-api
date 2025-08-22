@@ -3,10 +3,10 @@ package br.com.promo.panfleteiro.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "ad")
@@ -29,8 +29,10 @@ public class Ad implements Serializable {
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Market> markets;
 
+    @NotNull
     private LocalDate initialDate;
 
+    @NotNull
     private LocalDate expirationDate;
 
     public Ad(String url, Boolean active, BigDecimal price) {
