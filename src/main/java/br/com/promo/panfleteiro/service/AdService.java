@@ -56,6 +56,7 @@ public class AdService {
         adResponse.setProductCategory(ad.getProductCategory().getName());
         adResponse.setInitialDate(ad.getInitialDate());
         adResponse.setExpirationDate(ad.getExpirationDate());
+        adResponse.setCreationDate(ad.getCreationDate());
         return adResponse;
     }
 

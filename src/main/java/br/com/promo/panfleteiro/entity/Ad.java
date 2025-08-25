@@ -35,6 +35,8 @@ public class Ad implements Serializable {
     @NotNull
     private LocalDate expirationDate;
 
+    private final LocalDate creationDate = LocalDate.now();
+
     public Ad(String url, Boolean active, BigDecimal price) {
         this.url = url;
         this.active = active;
@@ -114,5 +116,9 @@ public class Ad implements Serializable {
 
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public LocalDate getCreationDate() {
+        return creationDate;
     }
 }
