@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import br.com.promo.panfleteiro.helper.MarketLocationHelper;
 import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import br.com.promo.panfleteiro.entity.Location;
@@ -98,5 +99,16 @@ public class MarketService {
 
     public Market findByExternalCode(String marketExternalCode) {
         return marketRepository.findByExternalCode(marketExternalCode);
+    }
+
+    public Market findMarketContainingMarketId(Long marketId) {
+        return marketRepository.findMarketContainingMarketId(marketId).orElse(null);
+    }
+
+    @NotNull
+    public MarketResponse convertToMarketResponseWithDistance(Double latitude, Double longitude, Market market) {
+        MarketResponse response = marketLocationHelper.convertMarketToResponse(market);
+        response.setDistance(market.getLocation().calculateDistanceInKm(latitude, longitude));
+        return response;
     }
 }

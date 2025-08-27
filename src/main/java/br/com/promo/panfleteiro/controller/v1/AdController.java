@@ -37,9 +37,9 @@ public class AdController {
     private static final Logger logger = LoggerFactory.getLogger(AdController.class);
 
     @PostMapping
-    public ResponseEntity<List<AdResponse>> create(@Valid @RequestBody AdRequest adRequest) {
+    public ResponseEntity<AdResponse> create(@Valid @RequestBody AdRequest adRequest) {
         logger.info("Creating AdRequest: {}", adRequest);
-        List<AdResponse> adsResponse = adMarketHelper.createAd(adRequest);
+        AdResponse adsResponse = adMarketHelper.createAd(adRequest);
         logger.info("Created Ad successfully");
         return ResponseEntity.status(201).body(adsResponse);
     }
@@ -53,9 +53,9 @@ public class AdController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<AdResponse>> findById(@PathVariable Long id) {
+    public ResponseEntity<AdResponse> findById(@PathVariable Long id) {
         logger.info("Looking for AdResponse with ID: {}", id);
-        return ResponseEntity.ok(adMarketHelper.convertToAdsResponse(adService.findById(id)));
+        return ResponseEntity.ok(adMarketHelper.convertToAdResponse(adService.findById(id)));
     }
 
     @GetMapping
@@ -65,7 +65,7 @@ public class AdController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<List<AdResponse>> update(@PathVariable Long id, @RequestBody AdRequest adRequest) {
+    public ResponseEntity<AdResponse> update(@PathVariable Long id, @RequestBody AdRequest adRequest) {
         logger.info("Updating AdRequest with ID: {}", id);
         return ResponseEntity.ok(adMarketHelper.updateAd(id, adRequest));
     }
@@ -88,25 +88,6 @@ public class AdController {
         logger.info("Found {} ads by distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }
-
-    @GetMapping("/buscaPorDistancia")
-    public ResponseEntity<Page<AdResponse>> searchAdsByDistance(
-            @RequestParam Double latitude,
-            @RequestParam Double longitude,
-            @RequestParam Long rangeInKm,
-            @RequestParam Integer page,
-            @RequestParam Integer size) {
-        logger.info("Searching for ads by distance: {} km using latitude: {} and longitude: {}", rangeInKm, latitude, longitude);
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("active").descending());
-        Page<Ad> adsPage = adService.findAdsByDistance(latitude, longitude, rangeInKm, pageable);
-        List<AdResponse> adsResponseList = getAdsResponseListSorted(latitude, longitude, rangeInKm, adsPage);
-        Page<AdResponse> adsResponsePage = new PageImpl<>(manualPageableAdResponse(page, size, adsResponseList), pageable, adsResponseList.size());
-
-        logger.info("Found {} ads by distance.", adsResponsePage.getTotalElements());
-        return ResponseEntity.ok(adsResponsePage);
-    }
-
 
     @GetMapping("/buscaPorDistanciaENome")
     public ResponseEntity<Page<AdResponse>> searchAdsByProductNameAndDistance(
@@ -143,16 +124,24 @@ public class AdController {
     }
 
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
-        return adsPage.stream().flatMap(ad -> adMarketHelper.getAdResponseStreamForAllMarketsInRange(rangeInKm, ad, latitude, longitude))
-                .sorted(Comparator.comparing(AdResponse::getActive).reversed()
-                        .thenComparing(AdResponse::getDistance)
-                        .thenComparing(AdResponse::getProductName)
-                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
-                        )).collect(Collectors.toList());
+        List<AdResponse> adsResponseList = adsPage.stream().map(ad -> {
+            AdResponse adResponse = adMarketHelper.convertToAdResponseWithMarkets(ad, latitude, longitude);
+            adMarketHelper.orderMarketAdsByDistanceInRange(adResponse.getMarkets(), rangeInKm);
+            adResponse.getMarkets().stream().findFirst().ifPresent(m -> adResponse.setNearestMarketDistance(m.getDistance()));
+            return adResponse;
+        }).collect(Collectors.toList());
+
+
+        return adsResponseList.stream().sorted(Comparator.comparing(AdResponse::getActive).reversed()
+                .thenComparing(AdResponse::getNearestMarketDistance)
+                .thenComparing(AdResponse::getCreationDate)
+                .thenComparing(AdResponse::getProductName)
+                .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
+                )).collect(Collectors.toList());
     }
 
     private List<AdResponse> getAdsResponseListSorted(Page<Ad> adsPage) {
-        return adsPage.stream().map(adMarketHelper::convertToAdsResponse).flatMap(List::stream)
+        return adsPage.stream().map(adMarketHelper::convertToAdResponse)
                 .sorted(Comparator.comparing(AdResponse::getActive).reversed()
                         .thenComparing(AdResponse::getProductName)
                         .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()

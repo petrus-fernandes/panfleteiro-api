@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class AdMarketHelper {
@@ -36,11 +36,11 @@ public class AdMarketHelper {
     MarketService marketService;
 
     public List<AdResponse> listAdsResponseWithMarket() {
-        return adService.list().stream().flatMap(ad -> ad.getMarkets().stream().map(market -> {
-                AdResponse response = adService.convertToAdResponse(ad);
-                response.setMarket(marketLocationHelper.convertMarketToResponse(market));
-                return response;
-        })).collect(Collectors.toList());
+        return adService.list().stream().map(ad -> {
+            AdResponse response = adService.convertToAdResponse(ad);
+            response.setMarkets(ad.getMarkets().stream().map(market -> marketLocationHelper.convertMarketToResponse(market)).collect(Collectors.toList()));
+            return response;
+        }).collect(Collectors.toList());
     }
 
     public Ad createAdWithMarket(AdRequest adRequest) {
@@ -50,23 +50,26 @@ public class AdMarketHelper {
         return adService.saveAd(ad);
     }
 
-    public List<AdResponse> convertToAdsResponse(Ad ad) {
-        return ad.getMarkets().stream()
-                .map(market -> {
-                    AdResponse response = adService.convertToAdResponse(ad);
-                    response.setMarket(marketLocationHelper.convertMarketToResponse(market));
-                    return response;
-                }).collect(Collectors.toList());
+    public AdResponse convertToAdResponse(Ad ad) {
+        AdResponse response = adService.convertToAdResponse(ad);
+        response.setMarkets(ad.getMarkets().stream().map(market -> marketLocationHelper.convertMarketToResponse(market)).collect(Collectors.toList()));
+        return response;
     }
 
-    public List<AdResponse> createAd(AdRequest adRequest) {
+    public AdResponse convertToAdResponseWithMarkets(Ad ad, Double latitude, Double longitude) {
+        AdResponse adResponse = adService.convertToAdResponse(ad);
+        adResponse.setMarkets(ad.getMarkets().stream().map(market -> marketService.convertToMarketResponseWithDistance(latitude, longitude, market)).collect(Collectors.toList()));
+        return adResponse;
+    }
+
+    public AdResponse createAd(AdRequest adRequest) {
         Ad ad = this.createAdWithMarket(adRequest);
-        return this.convertToAdsResponse(ad);
+        return this.convertToAdResponse(ad);
     }
 
-    public List<AdResponse> updateAd(Long id, AdRequest adRequest) {
+    public AdResponse updateAd(Long id, AdRequest adRequest) {
         Ad ad = updateAdWithMarket(id, adRequest);
-        return this.convertToAdsResponse(ad);
+        return this.convertToAdResponse(ad);
     }
 
     private Ad updateAdWithMarket(Long id, AdRequest adRequest) {
@@ -108,23 +111,8 @@ public class AdMarketHelper {
         return expirationDate != null && expirationDate.isBefore(new Date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
     }
 
-    public AdResponse convertToAdResponseWithUniqueMarketAndDistance(Ad ad, Market market, Double distance) {
-        AdResponse adResponse = adService.convertToAdResponse(ad);
-        adResponse.setDistance(distance);
-        if (market != null) {
-            adResponse.setMarket(marketLocationHelper.convertMarketToResponse(market));
-        }
-        return adResponse;
-    }
-
-    public Stream<AdResponse> getAdResponseStreamForAllMarketsInRange(Long rangeInKm, Ad ad, Double latitude, Double longitude) {
-        return ad.getMarkets().stream()
-                .filter(market -> market.getLocation().calculateDistanceInKm(latitude, longitude) <= rangeInKm)
-                .map(market -> convertToAdResponseWithUniqueMarketAndDistance(ad, market, market.getLocation().calculateDistanceInKm(latitude, longitude)));
-    }
-
     public List<AdResponse> createAdLot(AdLotRequest adLotRequest) {
-        return adLotRequest.getAds().stream().flatMap(adRequest -> {
+        return adLotRequest.getAds().stream().map(adRequest -> {
             if (adRequest.getMarketsId() == null || adRequest.getMarketsId().isEmpty()) {
                 adRequest.setMarketsId(getMarketsId(adLotRequest));
             }
@@ -147,7 +135,7 @@ public class AdMarketHelper {
 
             normalizeProductName(adRequest);
             Ad ad = this.createAdWithMarket(adRequest);
-            return convertToAdsResponse(ad).stream();
+            return convertToAdResponse(ad);
         }).collect(Collectors.toList());
     }
 
@@ -192,5 +180,11 @@ public class AdMarketHelper {
         MarketResponse marketResponse = marketLocationHelper.convertMarketToResponse(market);
         market.getAds().forEach(ad -> marketResponse.getAds().add(adService.convertToAdResponse(ad)));
         return marketResponse;
+    }
+
+
+    public void orderMarketAdsByDistanceInRange(List<MarketResponse> markets, Long rangeInKm) {
+        markets.sort(Comparator.comparingDouble(MarketResponse::getDistance));
+        markets.removeIf(market -> market.getDistance() > rangeInKm);
     }
 }

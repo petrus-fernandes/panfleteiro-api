@@ -101,4 +101,8 @@ public class Market implements Serializable {
     public void setHeadQuarters(boolean headQuarters) {
         this.headQuarters = headQuarters;
     }
+
+    public boolean isMarketInRange(double latitude, double longitude, double range) {
+        return this.getLocation().calculateDistanceInKm(latitude, longitude) <= range;
+    }
 }

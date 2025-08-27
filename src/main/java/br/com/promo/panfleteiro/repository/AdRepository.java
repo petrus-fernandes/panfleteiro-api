@@ -19,36 +19,16 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
     @Query("SELECT a FROM Ad a " +
             "JOIN a.markets m " +
             "JOIN m.location l " +
-            "WHERE l.latitude BETWEEN :minLat AND :maxLat " +
-            "AND l.longitude BETWEEN :minLon AND :maxLon " +
-            "AND (6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
-            "* cos(radians(l.longitude) - radians(:baseLon)) " +
-            "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) <= :rangeInKm " +
-            "ORDER BY a.active DESC, " +
-            "(6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
-            "* cos(radians(l.longitude) - radians(:baseLon)) " +
-            "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) ASC, a.productName ASC")
-    Page<Ad> findAdsByDistanceWithBoundingBox(@Param("minLat") double minLat,
-                                              @Param("maxLat") double maxLat,
-                                              @Param("minLon") double minLon,
-                                              @Param("maxLon") double maxLon,
-                                              @Param("baseLat") double baseLat,
-                                              @Param("baseLon") double baseLon,
-                                              @Param("rangeInKm") double rangeInKm,
-                                              Pageable pageable);
-
-    @Query("SELECT a FROM Ad a " +
-            "JOIN a.markets m " +
-            "JOIN m.location l " +
             "WHERE l.latitude BETWEEN :minLat AND :maxLat AND UPPER(a.productName) LIKE UPPER(CONCAT('%', :productName, '%'))" +
             "AND l.longitude BETWEEN :minLon AND :maxLon " +
             "AND (6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
             "* cos(radians(l.longitude) - radians(:baseLon)) " +
             "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) <= :rangeInKm " +
             "ORDER BY a.active DESC, " +
-            "(6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) " +
-            "* cos(radians(l.longitude) - radians(:baseLon)) " +
-            "+ sin(radians(:baseLat)) * sin(radians(l.latitude)))) ASC, a.productName ASC")
+            "(6371 * acos(cos(radians(:baseLat)) * cos(radians(l.latitude)) * cos(radians(l.longitude) - radians(:baseLon)) + " +
+            "sin(radians(:baseLat)) * sin(radians(l.latitude)))) ASC, " +
+            "a.creationDate DESC, " +
+            "a.productName ASC")
     Page<Ad> findAdsByProductNameAndDistanceWithBoundingBox(@Param("minLat") double minLat,
                                                                   @Param("maxLat") double maxLat,
                                                                   @Param("minLon") double minLon,

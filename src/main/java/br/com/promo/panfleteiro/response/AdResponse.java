@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,11 +20,9 @@ public class AdResponse {
 
     private BigDecimal price;
 
-    private Double distance;
-
     private Boolean active;
 
-    private MarketResponse market;
+    private List<MarketResponse> markets;
 
     private String url;
 
@@ -35,4 +34,6 @@ public class AdResponse {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate creationDate;
+
+    private Double nearestMarketDistance;
 }
