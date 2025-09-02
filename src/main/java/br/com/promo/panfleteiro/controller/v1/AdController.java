@@ -133,8 +133,8 @@ public class AdController {
 
 
         return adsResponseList.stream().sorted(Comparator.comparing(AdResponse::getActive).reversed()
-                .thenComparing(AdResponse::getNearestMarketDistance)
                 .thenComparing(AdResponse::getCreationDate)
+                .thenComparing(AdResponse::getNearestMarketDistance)
                 .thenComparing(AdResponse::getProductName)
                 .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                 )).collect(Collectors.toList());
@@ -143,6 +143,7 @@ public class AdController {
     private List<AdResponse> getAdsResponseListSorted(Page<Ad> adsPage) {
         return adsPage.stream().map(adMarketHelper::convertToAdResponse)
                 .sorted(Comparator.comparing(AdResponse::getActive).reversed()
+                        .thenComparing(AdResponse::getCreationDate)
                         .thenComparing(AdResponse::getProductName)
                         .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
                         )).collect(Collectors.toList());
