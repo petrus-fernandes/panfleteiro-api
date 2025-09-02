@@ -2,7 +2,6 @@ package br.com.promo.panfleteiro.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import br.com.promo.panfleteiro.helper.MarketLocationHelper;
 import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
@@ -27,8 +26,8 @@ public class MarketService {
     }
 
     public MarketResponse create(MarketRequest marketRequest) {
-        validateExternalCode(marketRequest.getExternalCode());
-        validateMarketsId(marketRequest.getMarketsId());
+        applyValidations(marketRequest);
+
         Optional<Location> location = marketLocationHelper.findLocationWithAddress(marketRequest.getAddress());
         Location persistedLocation = location.orElseGet(() -> (marketLocationHelper.createLocationWithAddress(marketRequest.getAddress())));
         persistedLocation.setActive(true);
@@ -42,6 +41,14 @@ public class MarketService {
         }
 
         return marketLocationHelper.convertMarketToResponse(marketRepository.save(market));
+    }
+
+    private void applyValidations(MarketRequest marketRequest) {
+        validateExternalCode(marketRequest.getExternalCode());
+
+        if (marketRequest.getMarketsId() != null && !marketRequest.getMarketsId().isEmpty()) {
+            validateMarketsId(marketRequest.getMarketsId());
+        }
     }
 
     private void validateMarketsId(List<Long> marketsId) {
