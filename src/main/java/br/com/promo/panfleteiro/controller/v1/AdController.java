@@ -133,7 +133,7 @@ public class AdController {
 
 
         return adsResponseList.stream().sorted(Comparator.comparing(AdResponse::getActive).reversed()
-                .thenComparing(AdResponse::getCreationDate)
+                .thenComparing(AdResponse::getCreationDate).reversed()
                 .thenComparing(AdResponse::getNearestMarketDistance)
                 .thenComparing(AdResponse::getProductName)
                 .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()

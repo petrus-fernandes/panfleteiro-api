@@ -3,6 +3,7 @@ package br.com.promo.panfleteiro.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -35,7 +36,7 @@ public class Ad implements Serializable {
     @NotNull
     private LocalDate expirationDate;
 
-    private final LocalDate creationDate = LocalDate.now();
+    private final LocalDateTime creationDate = LocalDateTime.now();
 
     public Ad(String url, Boolean active, BigDecimal price) {
         this.url = url;
@@ -118,7 +119,7 @@ public class Ad implements Serializable {
         this.expirationDate = expirationDate;
     }
 
-    public LocalDate getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 }
