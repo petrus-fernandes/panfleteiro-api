@@ -16,10 +16,11 @@ public class ProductNameNormalizer {
             entry("\\bAlim\\b", "Alimento"),
             entry("\\bConc?\\b", "Concentrado"),
             entry("\\bLeite Cond?\\b", "Leite Condensado"),
-            entry("\\bRefri\\b", "Refrigerante"),
+            entry("\\bRefrig?\\b", "Refrigerante"),
             entry("\\bLing\\b", "Linguiça"),
             entry("\\bPapel Hig\\b", "Papel Higiênico"),
-            entry("\\bLt\\b", "Lata")
+            entry("\\bLt\\b", "Lata"),
+            entry("\\bRefres\\b", "Refresco")
     );
 
     private static AbstractMap.SimpleEntry<Pattern, String> entry(String regex, String replacement) {
@@ -31,7 +32,6 @@ public class ProductNameNormalizer {
 
         String result = rawName.trim();
 
-        // Regras básicas
         for (var rule : BASE_RULES) {
             result = rule.getKey().matcher(result).replaceAll(rule.getValue());
         }
