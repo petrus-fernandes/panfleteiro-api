@@ -41,6 +41,14 @@ public class Market implements Serializable {
         this.location = location;
     }
 
+    public void addAd(Ad ad) {
+        this.ads.add(ad);
+    }
+
+    public void removeAd(Ad ad) {
+        this.ads.remove(ad);
+    }
+
     public boolean isMarketInRange(double latitude, double longitude, double range) {
         return this.getLocation().calculateDistanceInKm(latitude, longitude) <= range;
     }
