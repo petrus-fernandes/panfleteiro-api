@@ -16,7 +16,7 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
     @Query("SELECT a FROM Ad a WHERE UPPER(a.productName) LIKE UPPER(CONCAT('%', :productName, '%'))")
     Page<Ad> findAdsByProductName(@Param("productName") String productName, Pageable pageable);
 
-    @Query("SELECT a FROM Ad a " +
+    @Query("SELECT DISTINCT a FROM Ad a " +
             "JOIN a.markets m " +
             "JOIN m.location l " +
             "WHERE l.latitude BETWEEN :minLat AND :maxLat AND UPPER(a.productName) LIKE UPPER(CONCAT('%', :productName, '%'))" +
