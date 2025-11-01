@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
@@ -113,6 +114,10 @@ public class AdMarketHelper {
 
     public List<AdResponse> createAdLot(AdLotRequest adLotRequest) {
         return adLotRequest.getAds().stream().map(adRequest -> {
+            if (adRequest.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException("O preço do produto " + adRequest.getProductName() + " não pode ser menor ou igual a zero");
+            }
+
             if (adRequest.getMarketsId() == null || adRequest.getMarketsId().isEmpty()) {
                 adRequest.setMarketsId(getMarketsId(adLotRequest));
             }
