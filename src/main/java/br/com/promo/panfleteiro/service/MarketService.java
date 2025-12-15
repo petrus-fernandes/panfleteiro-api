@@ -96,7 +96,8 @@ public class MarketService {
     }
 
     public void delete(Long id) {
-        Market market = marketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Market not found with ID: " + id));
+        Market market = marketRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Market not found with ID: " + id));
         marketRepository.delete(market);
     }
 
