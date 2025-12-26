@@ -132,12 +132,16 @@ public class AdController {
         }).collect(Collectors.toList());
 
 
-        return adsResponseList.stream().sorted(Comparator.comparing(AdResponse::getActive).reversed()
-                .thenComparing(AdResponse::getCreationDate).reversed()
-                .thenComparing(AdResponse::getNearestMarketDistance)
-                .thenComparing(AdResponse::getProductName)
-                .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
-                )).collect(Collectors.toList());
+        Comparator<AdResponse> comparator =
+                Comparator.comparing(AdResponse::getActive, Comparator.reverseOrder())
+                        .thenComparing(AdResponse::getCreationDate, Comparator.reverseOrder())
+                        .thenComparing(AdResponse::getNearestMarketDistance)
+                        .thenComparing(AdResponse::getProductName, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(AdResponse::getExpirationDate);
+
+        return adsResponseList.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
     }
 
     private List<AdResponse> getAdsResponseListSorted(Page<Ad> adsPage) {
