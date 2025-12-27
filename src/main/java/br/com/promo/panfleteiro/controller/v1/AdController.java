@@ -126,8 +126,7 @@ public class AdController {
     private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, Page<Ad> adsPage) {
         List<AdResponse> adsResponseList = adsPage.stream().map(ad -> {
             AdResponse adResponse = adMarketHelper.convertToAdResponseWithMarkets(ad, latitude, longitude);
-            adMarketHelper.orderMarketAdsByDistanceInRange(adResponse.getMarkets(), rangeInKm);
-            adResponse.getMarkets().stream().findFirst().ifPresent(m -> adResponse.setNearestMarketDistance(m.getDistance()));
+            adResponse.orderMarketsByDistanceInRange(rangeInKm);
             return adResponse;
         }).collect(Collectors.toList());
 

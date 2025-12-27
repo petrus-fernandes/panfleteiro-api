@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -37,4 +38,10 @@ public class AdResponse {
     private LocalDateTime creationDate;
 
     private Double nearestMarketDistance;
+
+    public void orderMarketsByDistanceInRange(Long rangeInKm) {
+        this.markets.sort(Comparator.comparingDouble(MarketResponse::getDistance));
+        this.markets.removeIf(market -> market.getDistance() > rangeInKm);
+        this.nearestMarketDistance = this.markets.stream().findFirst().map(MarketResponse::getDistance).orElse(null);
+    }
 }
