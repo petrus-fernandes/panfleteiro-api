@@ -4,8 +4,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.com.promo.panfleteiro.ad.AdSearchRequest;
 import br.com.promo.panfleteiro.helper.AdMarketHelper;
 import br.com.promo.panfleteiro.request.AdLotRequest;
+import br.com.promo.panfleteiro.util.MessageHelper;
 import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @RequestMapping(path = "v1/anuncios", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class AdController {
+
     @Autowired
     private AdService adService;
 
@@ -35,6 +38,10 @@ public class AdController {
     private AdMarketHelper adMarketHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(AdController.class);
+
+    @Autowired
+    private MessageHelper messageHelper;
+
 
     @PostMapping
     public ResponseEntity<AdResponse> create(@Valid @RequestBody AdRequest adRequest) {
@@ -56,12 +63,6 @@ public class AdController {
     public ResponseEntity<AdResponse> findById(@PathVariable Long id) {
         logger.info("Looking for AdResponse with ID: {}", id);
         return ResponseEntity.ok(adMarketHelper.convertToAdResponse(adService.findById(id)));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<AdResponse>> list() {
-        logger.info("Listing all AdResponses");
-        return ResponseEntity.ok(adMarketHelper.listAdsResponseWithMarket());
     }
 
     @PutMapping("/{id}")
@@ -96,7 +97,8 @@ public class AdController {
             @RequestParam Long rangeInKm,
             @RequestParam String productName,
             @RequestParam Integer page,
-            @RequestParam Integer size) {
+            @RequestParam Integer size
+    ) {
         logger.info("Searching for ads by product name: {} and distance: {} km using latitude: {} and longitude: {}",
                 productName, rangeInKm, latitude, longitude);
 
@@ -108,6 +110,30 @@ public class AdController {
         logger.info("Found {} ads by product name and distance.", adsResponsePage.getTotalElements());
         return ResponseEntity.ok(adsResponsePage);
     }
+
+    @GetMapping
+    public ResponseEntity<Page<AdResponse>> searchAds(
+            @ModelAttribute AdSearchRequest request,
+            Pageable pageable
+    ) {
+        validateAdSearchFields(request);
+        return ResponseEntity.ok(adMarketHelper.searchAds(request, pageable));
+    }
+
+    private void validateAdSearchFields(AdSearchRequest request) {
+        if (request.hasCep() == request.hasLatitudeAndLongitude()) {
+            throw new RuntimeException(
+                    messageHelper.get("ad.exception.adSearchMustHaveCepOrLatitudeAndLongitude")
+            );
+        }
+
+        if (request.hasCep() && request.getCep().length() != 8) {
+            throw new RuntimeException(
+                    messageHelper.get("ad.exception.adSearchCepMustHave8digits")
+            );
+        }
+    }
+
 
     @NotNull
     private static List<AdResponse> manualPageableAdResponse(Integer page, Integer size, List<AdResponse> adsResponseList) {
@@ -148,7 +174,7 @@ public class AdController {
                 .sorted(Comparator.comparing(AdResponse::getActive).reversed()
                         .thenComparing(AdResponse::getCreationDate)
                         .thenComparing(AdResponse::getProductName)
-                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()
-                        )).collect(Collectors.toList());
+                        .thenComparing(Comparator.comparing(AdResponse::getExpirationDate).reversed()))
+                .collect(Collectors.toList());
     }
 }

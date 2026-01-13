@@ -1,18 +1,27 @@
 package br.com.promo.panfleteiro.helper;
 
+import br.com.promo.panfleteiro.ad.AdSearchRequest;
 import br.com.promo.panfleteiro.entity.Ad;
+import br.com.promo.panfleteiro.entity.Location;
 import br.com.promo.panfleteiro.entity.Market;
 import br.com.promo.panfleteiro.entity.ProductCategory;
+import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
+import br.com.promo.panfleteiro.integration.service.GeocodingApiService;
 import br.com.promo.panfleteiro.request.AdLotRequest;
 import br.com.promo.panfleteiro.request.AdRequest;
 import br.com.promo.panfleteiro.response.AdResponse;
 import br.com.promo.panfleteiro.response.MarketResponse;
 import br.com.promo.panfleteiro.service.AdService;
+import br.com.promo.panfleteiro.service.BoundingBoxCalculator;
 import br.com.promo.panfleteiro.service.MarketService;
+import br.com.promo.panfleteiro.util.HaversineCalculator;
 import br.com.promo.panfleteiro.util.ProductNameNormalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -20,6 +29,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -35,6 +45,9 @@ public class AdMarketHelper {
 
     @Autowired
     MarketService marketService;
+
+    @Autowired
+    private GeocodingApiService geocodingApiService;
 
     public List<AdResponse> listAdsResponseWithMarket() {
         return adService.list().stream().map(ad -> {
@@ -102,10 +115,10 @@ public class AdMarketHelper {
 
     public void deactivateEntitiesByExpiratedDate() {
         adService.getActiveAds().stream().filter(ad -> isExpirated(ad.getExpirationDate())).forEach(ad -> {
-                ad.setActive(false);
-                adService.saveAd(ad);
-                logger.info("Ad: " + ad.getId() + " expirated.");
-            });
+            ad.setActive(false);
+            adService.saveAd(ad);
+            logger.info("Ad: " + ad.getId() + " expirated.");
+        });
     }
 
     private boolean isExpirated(LocalDate expirationDate) {
@@ -191,5 +204,68 @@ public class AdMarketHelper {
     public void orderMarketAdsByDistanceInRange(List<MarketResponse> markets, Long rangeInKm) {
         markets.sort(Comparator.comparingDouble(MarketResponse::getDistance));
         markets.removeIf(market -> market.getDistance() > rangeInKm);
+    }
+
+    private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, List<Ad> adsPage) {
+        List<AdResponse> adsResponseList = adsPage.stream().map(ad -> {
+            AdResponse adResponse = this.convertToAdResponseWithMarkets(ad, latitude, longitude);
+            adResponse.orderMarketsByDistanceInRange(rangeInKm);
+            return adResponse;
+        }).collect(Collectors.toList());
+
+
+        Comparator<AdResponse> comparator =
+                Comparator.comparing(AdResponse::getActive, Comparator.reverseOrder())
+                        .thenComparing(AdResponse::getCreationDate, Comparator.reverseOrder())
+                        .thenComparing(AdResponse::getNearestMarketDistance)
+                        .thenComparing(AdResponse::getProductName, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(AdResponse::getExpirationDate);
+
+        return adsResponseList.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+    }
+
+    public Page<AdResponse> searchAds(AdSearchRequest request, Pageable pageable) {
+        if (request.getCep() != null) {
+            Location location = geocodingApiService.getLocationWithAddress(request.getCep());
+            request.setLatitude(location.getLatitude());
+            request.setLongitude(location.getLongitude());
+        }
+
+        Page<Ad> adsPage = adService.search(request, pageable);
+
+        if (request.getLatitude() == null || request.getLongitude() == null || request.getRangeInKm() == null) {
+            return adsPage.map(this::convertToAdResponse);
+        }
+
+        double latitude = request.getLatitude();
+        double longitude = request.getLongitude();
+        Long range = request.getRangeInKm();
+
+        List<Ad> filteredAds = adsPage.getContent().stream()
+                .filter(ad -> anyMarketInRangeWithHarversine(ad.getMarkets(), latitude, longitude, range))
+                .toList();
+
+        List<AdResponse> responseList = getAdsResponseListSorted(latitude, longitude, range, filteredAds);
+
+        return new PageImpl<>(responseList, pageable, filteredAds.size());
+    }
+
+    private boolean anyMarketInRangeWithHarversine(
+            List<Market> markets,
+            double baseLat,
+            double baseLon,
+            double rangeInKm
+    ) {
+        return markets.stream().anyMatch(market -> {
+                    double distance = HaversineCalculator.distanceInKm(
+                            baseLat,
+                            baseLon,
+                            market.getLocation().getLatitude(),
+                            market.getLocation().getLongitude()
+                    );
+                    return distance <= rangeInKm;
+        });
     }
 }

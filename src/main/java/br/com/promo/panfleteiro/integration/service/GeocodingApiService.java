@@ -2,6 +2,9 @@ package br.com.promo.panfleteiro.integration.service;
 
 import java.io.IOException;
 
+import br.com.promo.panfleteiro.util.MessageHelper;
+import org.hibernate.boot.beanvalidation.IntegrationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,9 @@ import br.com.promo.panfleteiro.entity.Location;
 @Service
 public class GeocodingApiService {
 
+    @Autowired
+    private MessageHelper messageHelper;
+
     private final String apiKey;
 
     public GeocodingApiService(@Value("${google.api.key}") String apiKey) {
@@ -23,6 +29,9 @@ public class GeocodingApiService {
 
     public Location getLocationWithAddress(String address) {
         GeocodingResult[] response = getGeocodingResult(address);
+        if (response.length == 0) {
+            throw new IntegrationException(messageHelper.get("geocode.addressNotFound"));
+        }
         return toLocation(response[0]);
     }
 

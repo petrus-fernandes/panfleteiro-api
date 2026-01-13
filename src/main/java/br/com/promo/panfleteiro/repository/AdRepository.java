@@ -5,12 +5,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.promo.panfleteiro.entity.Ad;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface AdRepository extends JpaRepository<Ad, Long> {
+public interface AdRepository extends JpaRepository<Ad, Long>, JpaSpecificationExecutor<Ad> {
 
 
     @Query("SELECT a FROM Ad a WHERE UPPER(a.productName) LIKE UPPER(CONCAT('%', :productName, '%'))")

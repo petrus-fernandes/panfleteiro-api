@@ -1,16 +1,25 @@
 package br.com.promo.panfleteiro.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import br.com.promo.panfleteiro.ad.AdSearchRequest;
+import br.com.promo.panfleteiro.ad.AdSpecification;
+import br.com.promo.panfleteiro.entity.Location;
 import br.com.promo.panfleteiro.entity.Market;
 import br.com.promo.panfleteiro.entity.ProductCategory;
 import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
+import br.com.promo.panfleteiro.helper.AdMarketHelper;
+import br.com.promo.panfleteiro.integration.service.GeocodingApiService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import br.com.promo.panfleteiro.entity.Ad;
@@ -85,5 +94,46 @@ public class AdService {
         return adRepository.findByActive(true);
     }
 
+    public Page<Ad> findAdsByProductNameAndDistanceWithBoundingBox(double minLat,
+                                                                   double maxLat,
+                                                                   double minLon,
+                                                                   double maxLon,
+                                                                   double baseLat,
+                                                                   double baseLon,
+                                                                   double rangeInKm,
+                                                                   String productName,
+                                                                   Pageable pageable) {
 
+        return adRepository.findAdsByProductNameAndDistanceWithBoundingBox(minLat, maxLat, minLon, maxLon, baseLat,
+                baseLon, rangeInKm, productName, pageable);
+    }
+
+    public Page<Ad> search(
+            AdSearchRequest adSearchRequest,
+            Pageable pageable
+    ) {
+        Specification<Ad> specification = Specification.where(null);
+
+        specification = specification.and(AdSpecification.productNameLike(adSearchRequest.getProductName()));
+        specification = specification.and(AdSpecification.isActive(adSearchRequest.getActive()));
+
+        Double latitude = adSearchRequest.getLatitude();
+        Double longitude = adSearchRequest.getLongitude();
+        Long rangeInKm = adSearchRequest.getRangeInKm();
+
+        if (latitude != null && longitude != null && rangeInKm != null) {
+            Map<String, Double> box = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
+
+            specification = specification.and(
+                    AdSpecification.withinBoundingBox(
+                            box.get("minLat"),
+                            box.get("maxLat"),
+                            box.get("minLon"),
+                            box.get("maxLon")
+                    )
+            );
+        }
+
+        return adRepository.findAll(specification, pageable);
+    }
 }
