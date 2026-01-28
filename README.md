@@ -122,13 +122,18 @@ This project aims to provide a scalable foundation for:
 
 ## Future Improvements
 
-* Administrative interface for manual validation of extracted ads
 * Geocoding result caching
 * Ad ranking by relevance
 * Support for multiple flyer sources
+* Shopping cart and checkout
 
 ---
 
+## Link
+
+*https://mercadao.co*
+
+---
 ## Author
 
 **Petrus Fernandes**
