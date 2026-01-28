@@ -1,6 +1,6 @@
 package br.com.promo.panfleteiro.infra.security;
 
-import br.com.promo.panfleteiro.service.UserService;
+import br.com.promo.panfleteiro.v1.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

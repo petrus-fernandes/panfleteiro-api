@@ -13,7 +13,7 @@ import com.google.maps.GeocodingApi;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.GeocodingResult;
 
-import br.com.promo.panfleteiro.entity.Location;
+import br.com.promo.panfleteiro.v1.location.Location;
 
 @Service
 public class GeocodingApiService {

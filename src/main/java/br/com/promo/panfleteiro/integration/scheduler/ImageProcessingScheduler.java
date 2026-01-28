@@ -1,9 +1,9 @@
 package br.com.promo.panfleteiro.integration.scheduler;
 
-import br.com.promo.panfleteiro.entity.FlyerValidation;
+import br.com.promo.panfleteiro.v1.flyer.validation.FlyerValidation;
 import br.com.promo.panfleteiro.integration.service.ChatGptService;
 import br.com.promo.panfleteiro.integration.service.GoogleDriveService;
-import br.com.promo.panfleteiro.service.FlyerValidationService;
+import br.com.promo.panfleteiro.v1.flyer.validation.FlyerValidationService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;

@@ -1,6 +1,6 @@
 package br.com.promo.panfleteiro.config;
 
-import br.com.promo.panfleteiro.service.UserService;
+import br.com.promo.panfleteiro.v1.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;

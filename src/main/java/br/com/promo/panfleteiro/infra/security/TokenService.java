@@ -1,6 +1,6 @@
 package br.com.promo.panfleteiro.infra.security;
 
-import br.com.promo.panfleteiro.entity.User;
+import br.com.promo.panfleteiro.v1.user.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;

@@ -1,6 +1,6 @@
 package br.com.promo.panfleteiro.job;
 
-import br.com.promo.panfleteiro.helper.AdMarketHelper;
+import br.com.promo.panfleteiro.v1.ad.AdMarketHelper;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
