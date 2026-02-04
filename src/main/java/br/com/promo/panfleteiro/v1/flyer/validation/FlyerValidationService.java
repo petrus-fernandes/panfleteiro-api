@@ -24,7 +24,7 @@ public class FlyerValidationService {
         if (optional.isPresent()) {
             firstFlyerValidation = optional.get();
             firstFlyerValidation.setReservedBy(usuario);
-            firstFlyerValidation.setReserveDate(LocalDateTime.now());
+            firstFlyerValidation.setReservedDate(LocalDateTime.now());
         } else {
             throw new BadRequestException("Não há panfletos disponíveis para reserva");
         }

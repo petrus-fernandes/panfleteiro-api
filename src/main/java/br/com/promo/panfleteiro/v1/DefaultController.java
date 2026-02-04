@@ -1,4 +1,4 @@
-package br.com.promo.panfleteiro;
+package br.com.promo.panfleteiro.v1;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

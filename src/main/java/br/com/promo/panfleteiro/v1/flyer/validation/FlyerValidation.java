@@ -25,7 +25,7 @@ public class FlyerValidation {
 
     private String reservedBy;
 
-    private LocalDateTime reserveDate;
+    private LocalDateTime reservedDate;
 
     private LocalDateTime creationDate = LocalDateTime.now();
 
