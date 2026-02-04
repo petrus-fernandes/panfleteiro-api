@@ -10,12 +10,12 @@ import java.util.Optional;
 
 public interface FlyerValidationRepository extends JpaRepository<FlyerValidation, Long> {
 
-    @Query("SELECT r FROM FlyerValidation r WHERE (r.reservedBy IS NULL OR r.reserveDate < :expiration) ORDER BY r.creationDate ASC")
+    @Query("SELECT r FROM FlyerValidation r WHERE (r.reservedBy IS NULL OR r.reservedDate < :expiration) ORDER BY r.creationDate ASC")
     List<FlyerValidation> findAvaiablesValidation(@Param("expiration") LocalDateTime expiration);
 
     Optional<FlyerValidation> findByIdAndReservedBy(Long id, String reservedBy);
 
-    @Query("SELECT r FROM FlyerValidation r WHERE (r.reservedBy IS NULL OR r.reserveDate < :expiration) ORDER BY r.creationDate ASC")
+    @Query("SELECT r FROM FlyerValidation r WHERE (r.reservedBy IS NULL OR r.reservedDate < :expiration) ORDER BY r.creationDate ASC")
     Optional<FlyerValidation> findFirstAvaiable(@Param("expiration") LocalDateTime expiration);
 }
 
