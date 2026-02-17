@@ -16,11 +16,10 @@ public class FlyerValidation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(name = "image", columnDefinition = "bytea")
     private byte[] image;
 
-    @Column(columnDefinition = "MEDIUMTEXT")
+    @Column(name = "response", columnDefinition = "text")
     private String response;
 
     private String reservedBy;

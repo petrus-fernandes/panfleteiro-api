@@ -24,6 +24,7 @@ public class Ad implements Serializable {
 
     private String productName;
 
+    @Enumerated(EnumType.STRING)
     private ProductCategory productCategory;
 
     private String url;
@@ -32,7 +33,8 @@ public class Ad implements Serializable {
 
     private BigDecimal price;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(name = "ad_markets", joinColumns = @JoinColumn(name = "ad_id"), inverseJoinColumns = @JoinColumn(name = "market_id"))
     private List<Market> markets;
 
     @NotNull

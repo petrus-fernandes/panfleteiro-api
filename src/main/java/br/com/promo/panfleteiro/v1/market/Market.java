@@ -34,6 +34,7 @@ public class Market implements Serializable {
     private String externalCode;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "market_chain", joinColumns = @JoinColumn(name = "parent_market_id"), inverseJoinColumns = @JoinColumn(name = "child_market_id"))
     private List<Market> marketChain;
 
     private boolean headQuarters;

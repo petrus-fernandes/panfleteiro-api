@@ -1,0 +1,126 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-enable-postgis
+      author: petrus
+      changes:
+        - sql:
+            sql: CREATE EXTENSION IF NOT EXISTS postgis;
+
+  - changeSet:
+      id: 010-create-location
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE IF NOT EXISTS location (
+                id           BIGSERIAL PRIMARY KEY,
+                latitude     DOUBLE PRECISION,
+                longitude    DOUBLE PRECISION,
+                address      VARCHAR(255) NOT NULL UNIQUE,
+                active       BOOLEAN
+              );
+
+  - changeSet:
+      id: 011-create-market
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE IF NOT EXISTS market (
+                id            BIGSERIAL PRIMARY KEY,
+                name          VARCHAR(255),
+                location_id   BIGINT,
+                external_code VARCHAR(255) UNIQUE,
+                head_quarters BOOLEAN NOT NULL DEFAULT FALSE,
+                CONSTRAINT fk_location_market
+                  FOREIGN KEY (location_id) REFERENCES location(id)
+              );
+
+  - changeSet:
+      id: 012-create-market-chain-join
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE IF NOT EXISTS market_chain (
+                parent_market_id BIGINT NOT NULL,
+                child_market_id  BIGINT NOT NULL,
+                PRIMARY KEY (parent_market_id, child_market_id),
+                CONSTRAINT fk_market_chain_parent
+                  FOREIGN KEY (parent_market_id) REFERENCES market(id) ON DELETE CASCADE,
+                CONSTRAINT fk_market_chain_child
+                  FOREIGN KEY (child_market_id) REFERENCES market(id) ON DELETE CASCADE
+              );
+
+  - changeSet:
+      id: 020-create-ad
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE IF NOT EXISTS ad (
+                id              BIGSERIAL PRIMARY KEY,
+                product_name    VARCHAR(255),
+                product_category VARCHAR(50),
+                url             VARCHAR(1024),
+                active          BOOLEAN,
+                price           NUMERIC(19,2),
+                initial_date    DATE NOT NULL,
+                expiration_date DATE NOT NULL,
+                creation_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
+              );
+
+  - changeSet:
+      id: 021-create-ad-markets-join
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE IF NOT EXISTS ad_markets (
+                ad_id BIGINT NOT NULL,
+                market_id BIGINT NOT NULL,
+                PRIMARY KEY (ad_id, market_id),
+                CONSTRAINT fk_ad_markets_ad
+                  FOREIGN KEY (ad_id) REFERENCES ad(id) ON DELETE CASCADE,
+                CONSTRAINT fk_ad_markets_market
+                  FOREIGN KEY (market_id) REFERENCES market(id) ON DELETE CASCADE
+              );
+
+  - changeSet:
+      id: 030-create-flyer-validation
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE IF NOT EXISTS flyer_validation (
+                id            BIGSERIAL PRIMARY KEY,
+                image         BYTEA,
+                response      TEXT,
+                reserved_by   VARCHAR(255),
+                reserved_date TIMESTAMP WITHOUT TIME ZONE,
+                creation_date TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
+              );
+
+
+  - changeSet:
+      id: 040-create-user
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE TABLE IF NOT EXISTS app_user (
+                id       BIGSERIAL PRIMARY KEY,
+                login    VARCHAR(255),
+                password VARCHAR(255),
+                role     VARCHAR(50)
+              );
+
+  - changeSet:
+      id: 900-location-postgis-index
+      author: petrus
+      changes:
+        - sql:
+            sql: >-
+              CREATE INDEX IF NOT EXISTS idx_location_geog
+              ON location
+              USING GIST ((ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography));
