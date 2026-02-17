@@ -1,0 +1,50 @@
+# Migration Postgres 02/2026
+
+## 01 - Creating AWS services for database migration
+This was the first step, but we are not talking about this so much. It was necessary to create an RDS instance, a DMS (Database Migration Service) with a task,
+two endpoints and a replication instance.
+
+## 02 - Creating the tables in the new database
+I wanted to implement the liquidase management system, so I created the tables using a yaml file.
+
+## 03 - Migrating the data
+I used the DMS task to migrate the data from the old database to the new database. It created a new schema with the old database name.
+
+## 04 - Migrating to the new tables
+In this step I was thinking how I could do it in a easier way, as so the new tables was empties. I used the following strategy:
+
+* Look for all tables by schemas
+```sql
+select table_schema, table_name
+from information_schema.tables
+where table_type='BASE TABLE'
+order by table_schema, table_name;
+```
+
+* Look for all columns by the schema table and see if it fits
+```sql
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_schema='{schema}' AND table_name='{table_name}'
+ORDER BY ordinal_position;
+```
+
+* Inset datas into the new tables created by liquidbase. Example:
+```sql
+INSERT INTO public.location (id, latitude, longitude, address, active)
+SELECT id, latitude, longitude, address, active 
+FROM panfleteiro.location;
+```
+
+* If some columns change it's name, so you also need to change in the table
+```sql
+INSERT INTO public.market_chain (parent_market_id, child_market_id)
+SELECT market_id, market_chain_id
+FROM panfleteiro.market_market_chain;
+```
+
+* Check if the data matches the quantity.
+```sql
+SELECT COUNT(*) FROM public.location;
+SELECT COUNT(*) FROM panfleteiro.location;
+```
