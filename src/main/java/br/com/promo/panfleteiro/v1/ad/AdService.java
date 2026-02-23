@@ -79,20 +79,6 @@ public class AdService {
         return adRepository.findByActive(true);
     }
 
-    public Page<Ad> findAdsByProductNameAndDistanceWithBoundingBox(double minLat,
-                                                                   double maxLat,
-                                                                   double minLon,
-                                                                   double maxLon,
-                                                                   double baseLat,
-                                                                   double baseLon,
-                                                                   double rangeInKm,
-                                                                   String productName,
-                                                                   Pageable pageable) {
-
-        return adRepository.findAdsByProductNameAndDistanceWithBoundingBox(minLat, maxLat, minLon, maxLon, baseLat,
-                baseLon, rangeInKm, productName, pageable);
-    }
-
     public Page<Ad> search(
             AdSearchRequest adSearchRequest,
             Pageable pageable
@@ -102,22 +88,20 @@ public class AdService {
         specification = specification.and(AdSpecification.productNameLike(adSearchRequest.getProductName()));
         specification = specification.and(AdSpecification.isActive(adSearchRequest.getActive()));
 
-        Double latitude = adSearchRequest.getLatitude();
-        Double longitude = adSearchRequest.getLongitude();
-        Long rangeInKm = adSearchRequest.getRangeInKm();
+        specification = specification.and(
+                AdSpecification.withinDistanceUsingGist(
+                        adSearchRequest.getLatitude(),
+                        adSearchRequest.getLongitude(),
+                        adSearchRequest.getRangeInKm()
+                )
+        );
 
-        if (latitude != null && longitude != null && rangeInKm != null) {
-            Map<String, Double> box = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
-
-            specification = specification.and(
-                    AdSpecification.withinBoundingBox(
-                            box.get("minLat"),
-                            box.get("maxLat"),
-                            box.get("minLon"),
-                            box.get("maxLon")
-                    )
-            );
-        }
+        specification = specification.and(
+                AdSpecification.orderBySearchRanking(
+                        adSearchRequest.getLatitude(),
+                        adSearchRequest.getLongitude()
+                )
+        );
 
         return adRepository.findAll(specification, pageable);
     }
