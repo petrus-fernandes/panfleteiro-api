@@ -102,22 +102,13 @@ public class AdService {
         specification = specification.and(AdSpecification.productNameLike(adSearchRequest.getProductName()));
         specification = specification.and(AdSpecification.isActive(adSearchRequest.getActive()));
 
-        Double latitude = adSearchRequest.getLatitude();
-        Double longitude = adSearchRequest.getLongitude();
-        Long rangeInKm = adSearchRequest.getRangeInKm();
-
-        if (latitude != null && longitude != null && rangeInKm != null) {
-            Map<String, Double> box = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
-
-            specification = specification.and(
-                    AdSpecification.withinBoundingBox(
-                            box.get("minLat"),
-                            box.get("maxLat"),
-                            box.get("minLon"),
-                            box.get("maxLon")
-                    )
-            );
-        }
+        specification = specification.and(
+                AdSpecification.withinDistanceUsingGist(
+                        adSearchRequest.getLatitude(),
+                        adSearchRequest.getLongitude(),
+                        adSearchRequest.getRangeInKm()
+                )
+        );
 
         return adRepository.findAll(specification, pageable);
     }
