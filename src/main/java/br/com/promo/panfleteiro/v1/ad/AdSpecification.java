@@ -71,12 +71,10 @@ public final class AdSpecification {
                 return null;
             }
 
-            Join<Ad, Market> marketJoin = root.join("markets", JoinType.INNER);
-            Join<Market, Location> locationJoin = marketJoin.join("location", JoinType.INNER);
-
-            if (query != null) {
-                query.distinct(true);
-            }
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<Ad> subAd = subquery.from(Ad.class);
+            Join<Ad, Market> subMarketJoin = subAd.join("markets", JoinType.INNER);
+            Join<Market, Location> subLocationJoin = subMarketJoin.join("location", JoinType.INNER);
 
             Expression<?> locationGeometry = cb.function(
                     "ST_SetSRID",
@@ -84,8 +82,8 @@ public final class AdSpecification {
                     cb.function(
                             "ST_MakePoint",
                             Object.class,
-                            locationJoin.get("longitude"),
-                            locationJoin.get("latitude")
+                            subLocationJoin.get("longitude"),
+                            subLocationJoin.get("latitude")
                     ),
                     cb.literal(4326)
             );
@@ -105,15 +103,21 @@ public final class AdSpecification {
             Expression<?> locationGeography = cb.function("geography", Object.class, locationGeometry);
             Expression<?> baseGeography = cb.function("geography", Object.class, baseGeometry);
 
-            return cb.isTrue(
-                    cb.function(
-                            "ST_DWithin",
-                            Boolean.class,
-                            locationGeography,
-                            baseGeography,
-                            cb.literal(rangeInKm * 1000d)
+            subquery.select(subAd.get("id"));
+            subquery.where(
+                    cb.equal(subAd.get("id"), root.get("id")),
+                    cb.isTrue(
+                            cb.function(
+                                    "ST_DWithin",
+                                    Boolean.class,
+                                    locationGeography,
+                                    baseGeography,
+                                    cb.literal(rangeInKm * 1000d)
+                            )
                     )
             );
+
+            return cb.exists(subquery);
         };
     }
 
