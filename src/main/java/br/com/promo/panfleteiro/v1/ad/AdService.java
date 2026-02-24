@@ -110,6 +110,13 @@ public class AdService {
                 )
         );
 
+        specification = specification.and(
+                AdSpecification.orderBySearchRanking(
+                        adSearchRequest.getLatitude(),
+                        adSearchRequest.getLongitude()
+                )
+        );
+
         return adRepository.findAll(specification, pageable);
     }
 }

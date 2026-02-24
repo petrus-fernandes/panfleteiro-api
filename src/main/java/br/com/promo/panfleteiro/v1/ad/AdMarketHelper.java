@@ -6,13 +6,11 @@ import br.com.promo.panfleteiro.v1.market.MarketLocationHelper;
 import br.com.promo.panfleteiro.integration.service.GeocodingApiService;
 import br.com.promo.panfleteiro.v1.market.MarketResponse;
 import br.com.promo.panfleteiro.v1.market.MarketService;
-import br.com.promo.panfleteiro.util.HaversineCalculator;
 import br.com.promo.panfleteiro.util.ProductNameNormalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -196,27 +194,6 @@ public class AdMarketHelper {
         markets.sort(Comparator.comparingDouble(MarketResponse::getDistance));
         markets.removeIf(market -> market.getDistance() > rangeInKm);
     }
-
-    private List<AdResponse> getAdsResponseListSorted(Double latitude, Double longitude, Long rangeInKm, List<Ad> adsPage) {
-        List<AdResponse> adsResponseList = adsPage.stream().map(ad -> {
-            AdResponse adResponse = this.convertToAdResponseWithMarkets(ad, latitude, longitude);
-            adResponse.orderMarketsByDistanceInRange(rangeInKm);
-            return adResponse;
-        }).collect(Collectors.toList());
-
-
-        Comparator<AdResponse> comparator =
-                Comparator.comparing(AdResponse::getActive, Comparator.reverseOrder())
-                        .thenComparing(AdResponse::getCreationDate, Comparator.reverseOrder())
-                        .thenComparing(AdResponse::getNearestMarketDistance)
-                        .thenComparing(AdResponse::getProductName, String.CASE_INSENSITIVE_ORDER)
-                        .thenComparing(AdResponse::getExpirationDate);
-
-        return adsResponseList.stream()
-                .sorted(comparator)
-                .collect(Collectors.toList());
-    }
-
     public Page<AdResponse> searchAds(AdSearchRequest request, Pageable pageable) {
         if (request.getCep() != null) {
             Location location = geocodingApiService.getLocationWithAddress(request.getCep());
@@ -230,33 +207,14 @@ public class AdMarketHelper {
             return adsPage.map(this::convertToAdResponse);
         }
 
-        double latitude = request.getLatitude();
-        double longitude = request.getLongitude();
-        Long range = request.getRangeInKm();
+        Double latitude = request.getLatitude();
+        Double longitude = request.getLongitude();
+        Long rangeInKm = request.getRangeInKm();
 
-        List<Ad> filteredAds = adsPage.getContent().stream()
-                .filter(ad -> anyMarketInRangeWithHarversine(ad.getMarkets(), latitude, longitude, range))
-                .toList();
-
-        List<AdResponse> responseList = getAdsResponseListSorted(latitude, longitude, range, filteredAds);
-
-        return new PageImpl<>(responseList, pageable, filteredAds.size());
-    }
-
-    private boolean anyMarketInRangeWithHarversine(
-            List<Market> markets,
-            double baseLat,
-            double baseLon,
-            double rangeInKm
-    ) {
-        return markets.stream().anyMatch(market -> {
-                    double distance = HaversineCalculator.distanceInKm(
-                            baseLat,
-                            baseLon,
-                            market.getLocation().getLatitude(),
-                            market.getLocation().getLongitude()
-                    );
-                    return distance <= rangeInKm;
+        return adsPage.map(ad -> {
+            AdResponse adResponse = this.convertToAdResponseWithMarkets(ad, latitude, longitude);
+            adResponse.orderMarketsByDistanceInRange(rangeInKm);
+            return adResponse;
         });
     }
 }

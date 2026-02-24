@@ -2,9 +2,12 @@ package br.com.promo.panfleteiro.v1.ad;
 
 import br.com.promo.panfleteiro.v1.location.Location;
 import br.com.promo.panfleteiro.v1.market.Market;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -113,4 +116,91 @@ public final class AdSpecification {
             );
         };
     }
+
+    public static Specification<Ad> orderBySearchRanking(Double latitude, Double longitude) {
+        return (root, query, cb) -> {
+            if (query == null || isCountQuery(query)) {
+                return cb.conjunction();
+            }
+
+            if (latitude != null && longitude != null) {
+                Expression<Double> nearestDistanceInMeters = nearestDistanceInMetersSubquery(root, query, cb, latitude, longitude);
+
+                query.orderBy(
+                        cb.desc(root.get("active")),
+                        cb.desc(root.get("creationDate")),
+                        cb.asc(nearestDistanceInMeters),
+                        cb.asc(cb.lower(root.get("productName"))),
+                        cb.asc(root.get("expirationDate"))
+                );
+            } else {
+                query.orderBy(
+                        cb.desc(root.get("active")),
+                        cb.desc(root.get("creationDate")),
+                        cb.asc(cb.lower(root.get("productName"))),
+                        cb.asc(root.get("expirationDate"))
+                );
+            }
+
+            return cb.conjunction();
+        };
+    }
+
+    private static boolean isCountQuery(CriteriaQuery<?> query) {
+        Class<?> resultType = query.getResultType();
+        return Long.class.equals(resultType) || long.class.equals(resultType);
+    }
+
+    private static Expression<Double> nearestDistanceInMetersSubquery(
+            Root<Ad> root,
+            CriteriaQuery<?> query,
+            jakarta.persistence.criteria.CriteriaBuilder cb,
+            Double latitude,
+            Double longitude
+    ) {
+        Subquery<Double> subquery = query.subquery(Double.class);
+        Root<Ad> subAd = subquery.from(Ad.class);
+        Join<Ad, Market> subMarketJoin = subAd.join("markets", JoinType.INNER);
+        Join<Market, Location> subLocationJoin = subMarketJoin.join("location", JoinType.INNER);
+
+        Expression<?> locationGeometry = cb.function(
+                "ST_SetSRID",
+                Object.class,
+                cb.function(
+                        "ST_MakePoint",
+                        Object.class,
+                        subLocationJoin.get("longitude"),
+                        subLocationJoin.get("latitude")
+                ),
+                cb.literal(4326)
+        );
+
+        Expression<?> baseGeometry = cb.function(
+                "ST_SetSRID",
+                Object.class,
+                cb.function(
+                        "ST_MakePoint",
+                        Object.class,
+                        cb.literal(longitude),
+                        cb.literal(latitude)
+                ),
+                cb.literal(4326)
+        );
+
+        Expression<?> locationGeography = cb.function("geography", Object.class, locationGeometry);
+        Expression<?> baseGeography = cb.function("geography", Object.class, baseGeometry);
+
+        Expression<Double> distanceInMeters = cb.function(
+                "ST_Distance",
+                Double.class,
+                locationGeography,
+                baseGeography
+        );
+
+        subquery.select(cb.min(distanceInMeters));
+        subquery.where(cb.equal(subAd.get("id"), root.get("id")));
+
+        return subquery.getSelection();
+    }
+
 }
