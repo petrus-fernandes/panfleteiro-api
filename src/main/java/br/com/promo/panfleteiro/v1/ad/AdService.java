@@ -86,7 +86,6 @@ public class AdService {
         Specification<Ad> specification = Specification.where(null);
 
         specification = specification.and(AdSpecification.productNameLike(adSearchRequest.getProductName()));
-        specification = specification.and(AdSpecification.isActive(adSearchRequest.getActive()));
 
         specification = specification.and(
                 AdSpecification.withinDistanceUsingGist(
