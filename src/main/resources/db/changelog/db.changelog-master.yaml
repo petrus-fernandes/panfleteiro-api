@@ -124,3 +124,36 @@ databaseChangeLog:
               CREATE INDEX IF NOT EXISTS idx_location_geog
               ON location
               USING GIST ((ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography));
+
+  - changeSet:
+      id: fix-location-sequence
+      author: petrus
+      changes:
+        - sql:
+            sql: |
+              SELECT setval(
+                pg_get_serial_sequence('location', 'id'),
+                (SELECT MAX(id) FROM location)
+              );
+
+  - changeSet:
+      id: fix-market-sequence
+      author: petrus
+      changes:
+        - sql:
+            sql: |
+              SELECT setval(
+                pg_get_serial_sequence('market', 'id'),
+                (SELECT MAX(id) FROM location)
+              );
+
+  - changeSet:
+      id: fix-market-sequence-ajusted
+      author: petrus
+      changes:
+        - sql:
+            sql: |
+              SELECT setval(
+                pg_get_serial_sequence('market', 'id'),
+                (SELECT MAX(id) FROM market)
+              );
