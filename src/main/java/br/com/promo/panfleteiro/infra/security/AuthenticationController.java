@@ -34,7 +34,7 @@ public class AuthenticationController {
     UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest loginRequest) {
         logger.info("Login: {}", loginRequest.login());
         UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
         Authentication authentication = authenticationManager.authenticate(usernamePassword);
@@ -44,7 +44,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity register(@RequestBody @Valid UserRequest userRequest) {
+    public ResponseEntity<?> register(@RequestBody @Valid UserRequest userRequest) {
         if (userRepository.findByLogin(userRequest.login()) != null) return ResponseEntity.badRequest().body("Login já cadastrado");
         logger.info("Registering User: {}", userRequest.login());
         String encryptedPassword = new BCryptPasswordEncoder().encode(userRequest.password());
@@ -55,7 +55,7 @@ public class AuthenticationController {
     }
 
     @PutMapping("/usuarios")
-    public ResponseEntity updateUser(@RequestBody @Valid UserRequest userRequest) {
+    public ResponseEntity<?> updateUser(@RequestBody @Valid UserRequest userRequest) {
         logger.info("Updating User: {}", userRequest.login());
         User user = userRepository.findUserByLogin(userRequest.login());
         if (user == null) return ResponseEntity.badRequest().body("Usuário não encontrado");
@@ -69,13 +69,13 @@ public class AuthenticationController {
     }
 
     @GetMapping("/usuarios")
-    public ResponseEntity findAllUsers() {
+    public ResponseEntity<?> findAllUsers() {
         logger.info("Listing all Users");
         return ResponseEntity.ok(userRepository.findAll());
     }
 
     @DeleteMapping("/usuarios/{id}")
-    public ResponseEntity delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         logger.info("Deleting User with ID: {}", id);
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();

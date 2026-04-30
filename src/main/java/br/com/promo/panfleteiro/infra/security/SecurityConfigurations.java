@@ -42,7 +42,6 @@ public class SecurityConfigurations {
                                 .requestMatchers(HttpMethod.DELETE, "/v1/auth/usuarios/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/v1/anuncios/desativarAnunciosExpirados").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/v1/**").hasRole("USER")
-//                                .requestMatchers(HttpMethod.POST, "/v1/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.PUT, "/v1/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.DELETE, "/v1/**").hasRole("USER")
                                 .anyRequest().authenticated()

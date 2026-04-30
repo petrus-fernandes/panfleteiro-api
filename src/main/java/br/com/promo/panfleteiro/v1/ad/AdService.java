@@ -1,16 +1,14 @@
 package br.com.promo.panfleteiro.v1.ad;
 
-import java.util.List;
-import java.util.Map;
-
 import br.com.promo.panfleteiro.exception.ResourceNotFoundException;
-import br.com.promo.panfleteiro.util.BoundingBoxCalculator;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AdService {
@@ -58,31 +56,15 @@ public class AdService {
         return adRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ad not found with ID: " + id));
     }
 
-    public Page<Ad> findAdsByProductName(String productName, Pageable pageable) {
-        return adRepository.findAdsByProductName(productName, pageable);
-    }
-
     public Ad saveAd(Ad ad) {
         return adRepository.save(ad);
-    }
-
-    public Page<Ad> findAdsByProductNameAndDistance(Double latitude, Double longitude, Long rangeInKm, Pageable pageable, String productName) {
-        Map<String, Double> boundingBox = BoundingBoxCalculator.calculateBoundingBox(latitude, longitude, rangeInKm);
-
-        return adRepository.findAdsByProductNameAndDistanceWithBoundingBox(
-                boundingBox.get("minLat"), boundingBox.get("maxLat"),
-                boundingBox.get("minLon"), boundingBox.get("maxLon"),
-                latitude, longitude, rangeInKm, productName, pageable);
     }
 
     public List<Ad> getActiveAds() {
         return adRepository.findByActive(true);
     }
 
-    public Page<Ad> search(
-            AdSearchRequest adSearchRequest,
-            Pageable pageable
-    ) {
+    public Page<Ad> search(AdSearchRequest adSearchRequest, Pageable pageable) {
         Specification<Ad> specification = Specification.where(null);
 
         specification = specification.and(AdSpecification.productNameLike(adSearchRequest.getProductName()));

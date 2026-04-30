@@ -21,12 +21,11 @@ public class TokenService {
     public String generateToken(User user) {
         try {
             Algorithm jwtAlgorithm =  Algorithm.HMAC256(secret);
-            String token = JWT.create()
+            return JWT.create()
                     .withIssuer("panfleteiro")
                     .withSubject(user.getUsername())
                     .withExpiresAt(getExpirationDate())
                     .sign(jwtAlgorithm);
-            return token;
         } catch (JWTCreationException e) {
             throw new RuntimeException("Error creating token" + e.getMessage());
         }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "v1/mercados", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 public class MarketController {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MarketController.class);
 
     @Autowired
     private AdMarketHelper adMarketHelper;
@@ -37,7 +37,6 @@ public class MarketController {
 
     @PostMapping
     public ResponseEntity<MarketResponse> create(@RequestBody MarketRequest marketRequest) {
-        logger.info("Creating Market: {}", marketRequest);
         MarketResponse marketResponse = marketService.create(marketRequest);
         logger.info("Created Market: {}", marketResponse.getId());
         return ResponseEntity.status(201).body(marketResponse);
